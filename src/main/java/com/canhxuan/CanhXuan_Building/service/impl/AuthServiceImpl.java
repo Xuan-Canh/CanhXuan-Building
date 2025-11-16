@@ -8,11 +8,14 @@ import com.canhxuan.CanhXuan_Building.entity.User;
 import com.canhxuan.CanhXuan_Building.repository.UserRepository;
 import com.canhxuan.CanhXuan_Building.service.AuthService;
 import com.canhxuan.CanhXuan_Building.utils.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -46,27 +49,29 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setCity(request.getCity());
+        user.setRole("ADMIN");
         userRepository.save(user);
         return "Register successfully";
     }
 
     @Override
     public ApiResponse<LoginResponse> login(LoginRequest request) {
+        ApiResponse<LoginResponse> response = new ApiResponse<>();
         try {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             String accessToken = jwtUtil.generateAccessToken(authentication);
             String refreshToken = jwtUtil.generateRefreshToken(authentication);
-            ApiResponse<LoginResponse> response = new ApiResponse<>();
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setUsername(request.getUsername());
             loginResponse.setAccessToken(accessToken);
             loginResponse.setRefreshToken(refreshToken);
+            response.setSuccess(true);
             response.setMessage("Login successfully, welcome " + request.getUsername());
             response.setData(loginResponse);
             return response;
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid username or password");
+        } catch (BadCredentialsException e) {
+            throw e;
         }
     }
 

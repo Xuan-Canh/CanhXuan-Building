@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiResponse <T>{
+    boolean success;
     String message;
     T data;
 }
