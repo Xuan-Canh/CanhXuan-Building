@@ -13,11 +13,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -62,13 +65,18 @@ public class AuthServiceImpl implements AuthService {
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             String accessToken = jwtUtil.generateAccessToken(authentication);
             String refreshToken = jwtUtil.generateRefreshToken(authentication);
+            String roles = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(","));
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setUsername(request.getUsername());
+            loginResponse.setRole(roles);
+            loginResponse.setUsername(request.getUsername().toLowerCase());
             loginResponse.setAccessToken(accessToken);
             loginResponse.setRefreshToken(refreshToken);
             response.setSuccess(true);
             response.setMessage("Login successfully, welcome " + request.getUsername());
             response.setData(loginResponse);
+            redisService.saveRefreshToken(refreshToken, request.getUsername().toLowerCase(), 60*24*7);
             return response;
         } catch (BadCredentialsException e) {
             throw e;
@@ -81,5 +89,19 @@ public class AuthServiceImpl implements AuthService {
         response.setMessage("Logout successfully");
         redisService.blackListToken(token, 15);
         return response;
+    }
+
+    @Override
+    public Map<String, String> refreshToken(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new RuntimeException("Refresh token is invalid");
+        }
+        String username = jwtUtil.getUsernameFromToken(refreshToken);
+        String tokenValue = redisService.getValue("refresh: " + refreshToken);
+        if (!username.equals(tokenValue)) {
+            throw new RuntimeException("Refresh token is invalid");
+        }
+        String newAccessToken = jwtUtil.generateAccessTokenByRefreshToken(refreshToken);
+        return Map.of("accessToken", newAccessToken);
     }
 }

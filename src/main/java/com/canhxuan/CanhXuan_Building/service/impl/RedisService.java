@@ -14,17 +14,17 @@ public class RedisService {
         this.redisTemplate = redisTemplate;
     }
 
-    public void saveToRedis(String token, String value, int timeToLive) {
-        redisTemplate.opsForValue().set(token, value, timeToLive, TimeUnit.MINUTES);
+    public void saveToRedis(String key, String value, int timeToLive) {
+        redisTemplate.opsForValue().set(key, value, timeToLive, TimeUnit.MINUTES);
     }
 
 //    public void saveAccessToken(String token, String value, int timeToLive) {
 //        redisTemplate.opsForValue().set("access: " + token, value, timeToLive, TimeUnit.MINUTES);
 //    }
 //
-//    public void saveRefreshToken(String token, String value, int timeToLive) {
-//        redisTemplate.opsForValue().set("refresh: " + token, value, timeToLive, TimeUnit.MINUTES);
-//    }
+    public void saveRefreshToken(String token, String value, int timeToLive) {
+        redisTemplate.opsForValue().set("refresh: " + token, value, timeToLive, TimeUnit.MINUTES);
+    }
 
     public void blackListToken(String token, int timeToLive) {
         redisTemplate.opsForValue().set("blacklist: " + token, "true", timeToLive, TimeUnit.MINUTES);
@@ -34,5 +34,8 @@ public class RedisService {
         return redisTemplate.hasKey("blacklist: " + token);
     }
 
+    public String getValue(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
 
 }

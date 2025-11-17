@@ -35,17 +35,17 @@ public class BuildingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Building>> getAll() {
+    public ResponseEntity<ApiResponse<List<Building>>> getAll() {
         return ResponseEntity.ok(buildingService.getAll());
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Building>> getByName(@RequestParam String name) {
+    public ResponseEntity<ApiResponse<List<Building>>> getByName(@RequestParam String name) {
         return ResponseEntity.ok(buildingService.getByName(name));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Building> getById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Building>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(buildingService.getById(id));
     }
 
@@ -72,7 +72,7 @@ public class BuildingController {
     }
 
     @PostMapping
-    public ResponseEntity<Building> create(@RequestBody Building building) {
+    public ResponseEntity<ApiResponse<Building>> create(@RequestBody Building building) {
         return ResponseEntity.ok(buildingService.create(building));
     }
 
@@ -88,7 +88,7 @@ public class BuildingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Building> update(@PathVariable Long id, @RequestBody Building building) {
+    public ResponseEntity<ApiResponse<Building>> update(@PathVariable Long id, @RequestBody Building building) {
         return ResponseEntity.ok(buildingService.update(id, building));
     }
 

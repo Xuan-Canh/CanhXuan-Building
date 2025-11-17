@@ -20,7 +20,7 @@ public class Building {
     String description;
     String address;
     Integer floors;
-    Integer apartments;
+    Integer rooms;
 
     @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

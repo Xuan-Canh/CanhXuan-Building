@@ -20,7 +20,7 @@ public class JwtUtil {
 
     private final String secretKey = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private final long refreshExpiration = 1000*60*60*24*7;
-    public final static long expiration = 1000 * 60 * 15;
+    public final static long expiration = 1000 * 60* 60;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -42,20 +42,28 @@ public class JwtUtil {
 
     public String generateRefreshToken(Authentication authentication) {
         String username = authentication.getName();
+        String roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
+                .claim("roles", roles)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String generateAccessTokenByRefreshToken(String refreshToken) {
         String username = getUsernameFromToken(refreshToken);
+        String roles = getRolesFromToken(refreshToken).stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .claim("roles", roles)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

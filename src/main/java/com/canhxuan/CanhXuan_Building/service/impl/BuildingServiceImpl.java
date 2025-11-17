@@ -19,34 +19,49 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public List<Building> getAll() {
-        return buildingRepository.findAll();
+    public ApiResponse<List<Building>> getAll() {
+        ApiResponse<List<Building>> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Get all buildings successfully");
+        apiResponse.setData(buildingRepository.findAll());
+        return apiResponse;
     }
 
     @Override
-    public List<Building> getByName(String name) {
-        return buildingRepository.findByName(name);
+    public ApiResponse<List<Building>> getByName(String name) {
+        ApiResponse<List<Building>> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Get buildings by name successfully");
+        apiResponse.setData(buildingRepository.findByName(name));
+        return apiResponse;
     }
 
     @Override
-    public Building getById(Long id) {
-        return buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id));
+    public ApiResponse<Building> getById(Long id) {
+        ApiResponse<Building> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Get building by id successfully");
+        apiResponse.setData(buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id)));
+        return apiResponse;
     }
 
     @Override
-    public Building create(Building building) {
-        return buildingRepository.save(building);
+    public ApiResponse<Building> create(Building building) {
+        ApiResponse<Building> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Create building successfully");
+        apiResponse.setData(buildingRepository.save(building));
+        return apiResponse;
     }
 
     @Override
-    public Building update(Long id, Building building) {
+    public ApiResponse<Building> update(Long id, Building building) {
         Building presentBuilding = buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id));
         presentBuilding.setName(building.getName());
         presentBuilding.setAddress(building.getAddress());
         presentBuilding.setDescription(building.getDescription());
-        presentBuilding.setApartments(building.getApartments());
+        presentBuilding.setRooms(building.getRooms());
         presentBuilding.setFloors(building.getFloors());
-        return buildingRepository.save(presentBuilding);
+        ApiResponse<Building> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Update building successfully");
+        apiResponse.setData(buildingRepository.save(presentBuilding));
+        return apiResponse;
     }
 
     @Override
