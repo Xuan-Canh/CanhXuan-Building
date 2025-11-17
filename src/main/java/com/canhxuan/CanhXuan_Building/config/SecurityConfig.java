@@ -39,14 +39,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/canhxuan/auth/**").permitAll()
-                        .requestMatchers(USER_ENDPOINTS).hasAnyAuthority("USER", "ADMIN")
-                        .requestMatchers("/canhxuan/buildings/*/images/**").hasAuthority("ADMIN")
+                        .requestMatchers("/canhxuan/buildings/*/images/**").permitAll() // Cho phép tất cả
                         .requestMatchers("/canhxuan/users", "/canhxuan/buildings/**").hasAuthority("ADMIN")
+                        .requestMatchers(USER_ENDPOINTS).hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

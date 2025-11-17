@@ -54,7 +54,7 @@ public class BuildingController {
         return ResponseEntity.ok(buildingImageService.findByBuildingId(buildingId));
     }
 
-    @GetMapping("/images/{fileName:.+}")
+    @GetMapping("{buildingId}/images/{fileName:.+}")
     public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         Resource resource = new UrlResource(filePath.toUri());
