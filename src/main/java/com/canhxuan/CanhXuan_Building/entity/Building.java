@@ -25,4 +25,9 @@ public class Building {
     @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     List<BuildingImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    List<Room> roomList = new ArrayList<>();
+
 }

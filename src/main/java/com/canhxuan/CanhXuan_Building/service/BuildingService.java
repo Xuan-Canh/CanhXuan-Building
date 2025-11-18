@@ -2,7 +2,10 @@ package com.canhxuan.CanhXuan_Building.service;
 
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Building;
+import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface BuildingService {
@@ -12,4 +15,7 @@ public interface BuildingService {
     ApiResponse<Building> create(Building building);
     ApiResponse<Building> update(Long id, Building building);
     ApiResponse<Void> delete(Long id);
+    public ApiResponse<BuildingImage> saveImage(Long buildingId, MultipartFile file) throws IOException;
+    public ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId);
+    public ApiResponse<Void> deleteImage(Long imageId);
 }

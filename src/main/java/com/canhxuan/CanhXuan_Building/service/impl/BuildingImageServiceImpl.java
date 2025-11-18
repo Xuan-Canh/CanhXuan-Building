@@ -27,51 +27,5 @@ public class BuildingImageServiceImpl implements BuildingImageService {
         this.buildingImageRepository = buildingImageRepository;
     }
 
-    @Override
-    public ApiResponse<BuildingImage> saveImage(Long buildingId, MultipartFile file) throws IOException {
-        Building building = buildingRepository.findById(buildingId)
-                .orElseThrow(() -> new RuntimeException("Building not found with id: " + buildingId));
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path uploadPath = Paths.get("uploads/images/building/");
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
 
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        BuildingImage buildingImage = new BuildingImage();
-        buildingImage.setBuilding(building);
-        buildingImage.setFileName(fileName);
-        buildingImage.setFilePath(filePath.toString());
-        buildingImage.setFileType(file.getContentType());
-        ApiResponse<BuildingImage> response = new ApiResponse<>();
-        response.setMessage("Save image successfully");
-        response.setData(buildingImageRepository.save(buildingImage));
-        return response;
-    }
-
-    @Override
-    public ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId) {
-        ApiResponse response = new ApiResponse<>();
-        response.setMessage("Get images successfully");
-        response.setData(buildingImageRepository.findByBuildingId(buildingId));
-        return response;
-    }
-
-    @Override
-    public ApiResponse<Void> deleteImage(Long imageId) {
-        BuildingImage image = buildingImageRepository.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found with id: " + imageId));
-        ApiResponse<Void> response = new ApiResponse<>();
-
-        try {
-            Files.deleteIfExists(Paths.get(image.getFilePath()));
-            buildingImageRepository.delete(image);
-            response.setMessage("Delete image successfully");
-        } catch (IOException e) {
-            throw new RuntimeException("Could not delete file: " + image.getFilePath(), e);
-        }
-        return response;
-    }
 }

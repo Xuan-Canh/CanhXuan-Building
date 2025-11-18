@@ -8,7 +8,5 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BuildingImageService {
-    public ApiResponse<BuildingImage> saveImage(Long buildingId, MultipartFile file) throws IOException;
-    public ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId);
-    public ApiResponse<Void> deleteImage(Long imageId);
+
 }

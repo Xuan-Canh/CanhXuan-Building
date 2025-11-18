@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/canhxuan/auth/**").permitAll()
                         .requestMatchers("/canhxuan/buildings/*/images/**").permitAll() // Cho phép tất cả
-                        .requestMatchers("/canhxuan/users", "/canhxuan/buildings/**").hasAuthority("ADMIN")
+                        .requestMatchers("/canhxuan/users", "/canhxuan/buildings/**", "/canhxuan/rooms/**", "/canhxuan/customers", "/canhxuan/contracts").hasAuthority("ADMIN")
                         .requestMatchers(USER_ENDPOINTS).hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

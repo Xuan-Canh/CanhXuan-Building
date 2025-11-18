@@ -27,11 +27,9 @@ public class BuildingController {
     private String uploadDir = "uploads/images/building/";
 
     private final BuildingService  buildingService;
-    private final BuildingImageService buildingImageService;
 
-    public BuildingController(BuildingService buildingService, BuildingImageService buildingImageService) {
+    public BuildingController(BuildingService buildingService) {
         this.buildingService = buildingService;
-        this.buildingImageService = buildingImageService;
     }
 
     @GetMapping
@@ -51,7 +49,7 @@ public class BuildingController {
 
     @GetMapping("/{buildingId}/images")
     public ResponseEntity<ApiResponse<List<BuildingImage>>> findByBuildingId(@PathVariable Long buildingId) {
-        return ResponseEntity.ok(buildingImageService.findByBuildingId(buildingId));
+        return ResponseEntity.ok(buildingService.findByBuildingId(buildingId));
     }
 
     @GetMapping("{buildingId}/images/{fileName:.+}")
@@ -80,7 +78,7 @@ public class BuildingController {
     public ResponseEntity<ApiResponse<BuildingImage>> addImageToBuilding(@PathVariable Long buildingId,
                                                                          @RequestParam("file") MultipartFile image) throws IOException {
         try {
-            return ResponseEntity.ok(buildingImageService.saveImage(buildingId, image));
+            return ResponseEntity.ok(buildingService.saveImage(buildingId, image));
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -99,6 +97,6 @@ public class BuildingController {
 
     @DeleteMapping("/{buildingId}/images/{imageId}")
     public ResponseEntity<ApiResponse<Void>> deleteBuildingImage(@PathVariable Long imageId) {
-        return ResponseEntity.ok(buildingImageService.deleteImage(imageId));
+        return ResponseEntity.ok(buildingService.deleteImage(imageId));
     }
 }
