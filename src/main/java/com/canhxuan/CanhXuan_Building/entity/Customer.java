@@ -40,6 +40,8 @@ public class Customer {
 
     String status;
 
+    String gender;
+
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     java.util.List<Contract> contracts;

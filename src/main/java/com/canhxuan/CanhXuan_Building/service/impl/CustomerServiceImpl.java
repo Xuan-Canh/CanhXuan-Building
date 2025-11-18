@@ -52,6 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
         currentCustomer.setCccd(customer.getCccd());
         currentCustomer.setPhone(customer.getPhone());
         currentCustomer.setEmail(customer.getEmail());
+        currentCustomer.setGender(customer.getGender());
         ApiResponse<Customer> response = new ApiResponse<>();
         response.setMessage("Update customer successfully");
         response.setData(customerRepository.save(currentCustomer));

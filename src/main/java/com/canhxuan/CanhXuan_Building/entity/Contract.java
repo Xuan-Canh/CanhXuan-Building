@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "contracts")
@@ -21,13 +22,19 @@ public class Contract {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id", nullable = false)
-    @JsonManagedReference
     Customer customer;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id", nullable = false)
-    @JsonManagedReference
     Room room;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "contract_services",
+            joinColumns = @JoinColumn(name = "contract_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    List<Service> services;
 
     LocalDate startDate;
     LocalDate endDate;
