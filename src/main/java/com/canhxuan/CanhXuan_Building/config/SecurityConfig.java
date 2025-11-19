@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 "/canhxuan/rooms/**",
                                 "/canhxuan/customers",
                                 "/canhxuan/contracts",
-                                "/canhxuan/services").hasAuthority("ADMIN")
+                                "/canhxuan/services",
+                                "/canhxuan/invoices").hasAuthority("ADMIN")
                         .requestMatchers(USER_ENDPOINTS).hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -5,6 +5,8 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.ContractResponse;
 import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.service.ContractService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +16,11 @@ import java.util.List;
 @RequestMapping("/canhxuan/contracts")
 public class ContractController {
     private final ContractService contractService;
+    private final com.canhxuan.CanhXuan_Building.service.impl.ContractReportService contractReportService;
 
-    public ContractController(ContractService contractService) {
+    public ContractController(ContractService contractService, com.canhxuan.CanhXuan_Building.service.impl.ContractReportService contractReportService) {
         this.contractService = contractService;
+        this.contractReportService = contractReportService;
     }
 
     @GetMapping
@@ -27,6 +31,37 @@ public class ContractController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Contract>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contractService.getById(id));
+    }
+
+    @GetMapping("/{id}/export")
+    public ResponseEntity<byte[]> exportContract(@PathVariable Long id) {
+        try {
+            byte[] pdfBytes = contractReportService.exportContract(id);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "contract_" + id + ".pdf");
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/{id}/send-email")
+    public ResponseEntity<ApiResponse<String>> sendContractEmail(@PathVariable Long id) {
+        try {
+            contractReportService.exportAndSendContract(id);
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .message("Email sent successfully")
+                    .data("Contract has been sent to customer's email")
+                    .build());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send contract email: " + e.getMessage(), e);
+        }
     }
 
     @PostMapping

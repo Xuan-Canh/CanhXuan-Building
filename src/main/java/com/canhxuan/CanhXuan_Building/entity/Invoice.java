@@ -1,39 +1,51 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "services")
+@Table(name = "invoices")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Service {
+public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "contract_id", nullable = false)
+    Contract contract;
+
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    java.util.List<InvoiceServiceDetail> serviceDetails;
+
     @Column(nullable = false)
-    String name;
-
-    String description;
+    LocalDate invoiceDate;
 
     @Column(nullable = false)
-    Double price;
+    LocalDate dueDate;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    ServiceType type; // METERED hoặc FIXED
+    Double roomRent; // Tiền phòng
 
-    String unit; // Đơn vị (kWh, m³, người, phòng...)
+    @Column(nullable = false)
+    Double totalServiceFee; // Tổng tiền dịch vụ
+
+    @Column(nullable = false)
+    Double totalAmount; // Tổng tiền
+
+    String status; // UNPAID, PAID, OVERDUE
+
+    LocalDateTime paidAt;
+
+    String note;
 
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

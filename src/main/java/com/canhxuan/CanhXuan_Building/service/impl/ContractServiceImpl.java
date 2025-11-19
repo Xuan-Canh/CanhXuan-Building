@@ -45,6 +45,7 @@ public class ContractServiceImpl implements ContractService {
             contractResponse.setDepositAmount(contract.getDepositAmount());
             contractResponse.setNote(contract.getNote());
             contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
+            contractResponse.setService(contract.getServices());
             return contractResponse;
         }).collect(Collectors.toList()));
         return response;
@@ -95,6 +96,7 @@ public class ContractServiceImpl implements ContractService {
         currentContract.setNote(contract.getNote());
         currentContract.setPaymentDueDate(contract.getPaymentDueDate());
         currentContract.setServices(contract.getServices());
+        currentContract.setCustomer(contract.getCustomer());
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Update contract successfully");
         response.setData(contractRepository.save(currentContract));

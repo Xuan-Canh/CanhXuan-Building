@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd
+              http://jasperreports.sourceforge.net/jasperreports/components
+              http://jasperreports.sourceforge.net/xsd/components.xsd"
+              name="ContractReport"
+              pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+
+    <!-- ===================== PARAMETERS ====================== -->
+    <parameter name="customerFullname" class="java.lang.String"/>
+    <parameter name="customerPhone" class="java.lang.String"/>
+    <parameter name="customerEmail" class="java.lang.String"/>
+    <parameter name="customerAddress" class="java.lang.String"/>
+    <parameter name="customerCccd" class="java.lang.String"/>
+    <parameter name="customerDob" class="java.lang.String"/>
+
+    <parameter name="roomName" class="java.lang.String"/>
+    <parameter name="roomFloor" class="java.lang.Integer"/>
+    <parameter name="roomCapacity" class="java.lang.Integer"/>
+    <parameter name="roomPrice" class="java.lang.Double"/>
+    <parameter name="roomDescription" class="java.lang.String"/>
+    <parameter name="buildingName" class="java.lang.String"/>
+    <parameter name="buildingAddress" class="java.lang.String"/>
+
+    <parameter name="startDate" class="java.lang.String"/>
+    <parameter name="endDate" class="java.lang.String"/>
+    <parameter name="monthlyRent" class="java.lang.Double"/>
+    <parameter name="depositAmount" class="java.lang.Double"/>
+    <parameter name="paymentDueDate" class="java.lang.Integer"/>
+    <parameter name="note" class="java.lang.String"/>
+    <parameter name="contractStatus" class="java.lang.String"/>
+
+    <parameter name="serviceDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+    <parameter name="SUBREPORT_DIR" class="net.sf.jasperreports.engine.JasperReport"/>
+
+
+    <!-- ===================== TITLE ====================== -->
+    <title>
+        <band height="80">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="40"/>
+                <textElement textAlignment="Center">
+                    <font fontName="DejaVu Sans" size="20" isBold="true" pdfEncoding="Identity-H"/>
+                </textElement>
+                <text><![CDATA[HỢP ĐỒNG THUÊ PHÒNG]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="0" y="50" width="555" height="20"/>
+                <textElement textAlignment="Center">
+                    <font fontName="DejaVu Sans" size="12"/>
+                </textElement>
+                <text><![CDATA[CX Apartment – Hà Nội]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- ===================== DETAIL ====================== -->
+    <detail>
+        <band height="680">
+
+            <!-- CUSTOMER INFO -->
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="20"/>
+                <textElement><font fontName="DejaVu Sans" isBold="true"/></textElement>
+                <text><![CDATA[1. Thông tin Bên B (Người thuê):]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="0" y="25" width="500" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Họ tên: " + $P{customerFullname}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="45" width="500" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Số điện thoại: " + $P{customerPhone}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="65" width="500" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Địa chỉ: " + $P{customerAddress}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="85" width="500" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["CCCD: " + $P{customerCccd}]]></textFieldExpression>
+            </textField>
+
+            <!-- ROOM INFO -->
+            <staticText>
+                <reportElement x="0" y="120" width="555" height="20"/>
+                <textElement><font fontName="DejaVu Sans" isBold="true"/></textElement>
+                <text><![CDATA[2. Thông tin phòng thuê:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="0" y="145" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Phòng: " + $P{roomName}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="165" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Tầng: " + $P{roomFloor}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="185" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Sức chứa: " + $P{roomCapacity} + " người"]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="205" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Tòa nhà: " + $P{buildingName}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="225" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Địa chỉ: " + $P{buildingAddress}]]></textFieldExpression>
+            </textField>
+
+            <!-- SERVICES TABLE -->
+            <staticText>
+                <reportElement x="0" y="260" width="555" height="20"/>
+                <textElement><font fontName="DejaVu Sans" isBold="true"/></textElement>
+                <text><![CDATA[3. Các dịch vụ đi kèm:]]></text>
+            </staticText>
+
+            <subreport>
+                <reportElement x="0" y="285" width="555" height="120"/>
+                <dataSourceExpression><![CDATA[$P{serviceDataSource}]]></dataSourceExpression>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport">
+                    <![CDATA[$P{SUBREPORT_DIR}]]>
+                </subreportExpression>
+            </subreport>
+
+
+            <!-- CONTRACT INFO -->
+            <staticText>
+                <reportElement x="0" y="420" width="555" height="20"/>
+                <textElement><font fontName="DejaVu Sans" isBold="true"/></textElement>
+                <text><![CDATA[4. Thông tin hợp đồng:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="0" y="445" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Ngày bắt đầu: " + $P{startDate}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="465" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Ngày kết thúc: " + $P{endDate}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="485" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Giá thuê/tháng: " + $P{monthlyRent}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="505" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Tiền cọc: " + $P{depositAmount}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="525" width="350" height="15"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Ngày đóng tiền hằng tháng: " + $P{paymentDueDate}]]></textFieldExpression>
+            </textField>
+
+            <!-- SIGNATURE -->
+            <staticText>
+                <reportElement x="0" y="580" width="555" height="20"/>
+                <textElement textAlignment="Center"><font fontName="DejaVu Sans" isBold="true"/></textElement>
+                <text><![CDATA[Chữ ký đại diện hai bên]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="30" y="610" width="200" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <text><![CDATA[Bên A]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="330" y="610" width="200" height="20"/>
+                <textElement>
+                    <font fontName="DejaVu Sans" pdfEncoding="Identity-H"/>
+                </textElement>
+                <text><![CDATA[Bên B]]></text>
+            </staticText>
+
+        </band>
+    </detail>
+
+</jasperReport>
