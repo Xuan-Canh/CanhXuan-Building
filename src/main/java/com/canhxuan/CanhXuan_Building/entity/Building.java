@@ -1,15 +1,19 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "buildings")
-@Data
+@Getter
+@Setter
 public class Building {
 
     @Id
@@ -27,7 +31,7 @@ public class Building {
     List<BuildingImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnoreProperties("building")
     List<Room> roomList = new ArrayList<>();
 
 }

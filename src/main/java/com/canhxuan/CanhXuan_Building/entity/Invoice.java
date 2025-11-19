@@ -4,6 +4,8 @@ package com.canhxuan.CanhXuan_Building.entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
@@ -11,7 +13,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invoices")
-@Data
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Invoice {
 

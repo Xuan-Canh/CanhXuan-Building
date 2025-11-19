@@ -4,8 +4,6 @@ import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
 import com.canhxuan.CanhXuan_Building.utils.kafka.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;

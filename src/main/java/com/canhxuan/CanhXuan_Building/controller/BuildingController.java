@@ -8,6 +8,7 @@ import com.canhxuan.CanhXuan_Building.service.BuildingService;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,8 @@ public class BuildingController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Building>>> getAll() {
-        return ResponseEntity.ok(buildingService.getAll());
+    public ResponseEntity<ApiResponse<Page<Building>>> getAll(@RequestParam (defaultValue = "0") int page) {
+        return ResponseEntity.ok(buildingService.getAll(page));
     }
 
     @GetMapping("/search")

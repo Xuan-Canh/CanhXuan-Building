@@ -11,7 +11,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "customers")
-@Data
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @NoArgsConstructor

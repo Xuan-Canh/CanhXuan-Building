@@ -6,9 +6,11 @@ import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
 import com.canhxuan.CanhXuan_Building.repository.BuildingImageRepository;
 import com.canhxuan.CanhXuan_Building.repository.BuildingRepository;
 import com.canhxuan.CanhXuan_Building.service.BuildingService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,10 +31,11 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public ApiResponse<List<Building>> getAll() {
-        ApiResponse<List<Building>> apiResponse = new ApiResponse<>();
+    public ApiResponse<Page<Building>> getAll(int page) {
+        Pageable pageable = PageRequest.of(page, 8);
+        ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Get all buildings successfully");
-        apiResponse.setData(buildingRepository.findAll());
+        apiResponse.setData(buildingRepository.findAll(pageable));
         return apiResponse;
     }
 

@@ -3,13 +3,14 @@ package com.canhxuan.CanhXuan_Building.service;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface BuildingService {
-    ApiResponse<List<Building>> getAll();
+    ApiResponse<Page<Building>> getAll(int page);
     ApiResponse<List<Building>> getByName(String name);
     ApiResponse<Building> getById(Long id);
     ApiResponse<Building> create(Building building);

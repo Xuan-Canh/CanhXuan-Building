@@ -6,6 +6,7 @@ import com.canhxuan.CanhXuan_Building.service.impl.ContractReportService;
 import com.canhxuan.CanhXuan_Building.service.impl.EmailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.retry.annotation.Backoff;
@@ -23,7 +24,7 @@ public class Consumer {
         this.emailService = emailService;
     }
 
-    @RetryableTopic(attempts = "3", backoff = @Backoff(delay = 2000))
+    @RetryableTopic(attempts = "1", backoff = @Backoff(delay = 2000))
     @KafkaListener(topics = "contract-topic", groupId = "CX-Apartment")
     public void consumeContractTopic(String message) throws Exception {
         Long contractId = new ObjectMapper().readValue(message, Long.class);
