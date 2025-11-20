@@ -2,11 +2,9 @@ package com.canhxuan.CanhXuan_Building.utils.kafka;
 
 import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
-import com.canhxuan.CanhXuan_Building.service.impl.ContractReportService;
+import com.canhxuan.CanhXuan_Building.service.impl.JasperService;
 import com.canhxuan.CanhXuan_Building.service.impl.EmailService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.retry.annotation.Backoff;
@@ -15,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class Consumer {
     private final ContractRepository contractRepository;
-    private final ContractReportService contractReportService;
+    private final JasperService contractReportService;
     private final EmailService emailService;
 
-    public Consumer(ContractRepository contractRepository, ContractReportService contractReportService, EmailService emailService) {
+    public Consumer(ContractRepository contractRepository, JasperService contractReportService, EmailService emailService) {
         this.contractRepository = contractRepository;
         this.contractReportService = contractReportService;
         this.emailService = emailService;

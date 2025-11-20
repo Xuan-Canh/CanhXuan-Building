@@ -5,27 +5,42 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.ContractResponse;
 import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.service.ContractService;
+import com.canhxuan.CanhXuan_Building.service.impl.JasperService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/canhxuan/contracts")
 public class ContractController {
     private final ContractService contractService;
-    private final com.canhxuan.CanhXuan_Building.service.impl.ContractReportService contractReportService;
+    private final JasperService jasperService;
 
-    public ContractController(ContractService contractService, com.canhxuan.CanhXuan_Building.service.impl.ContractReportService contractReportService) {
+    public ContractController(ContractService contractService, JasperService jasperService) {
         this.contractService = contractService;
-        this.contractReportService = contractReportService;
+        this.jasperService = jasperService;
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ContractResponse>>> getAll() {
-        return ResponseEntity.ok(contractService.getAll());
+    public ResponseEntity<ApiResponse<Page<ContractResponse>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(contractService.getAll(page));
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportContractsToExcel() throws Exception {
+        byte[] data = jasperService.exportContractsToExcel();
+        String filename = "Danh_sach_hop_dong_" +
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(data);
     }
 
     @GetMapping("/{id}")
@@ -36,7 +51,7 @@ public class ContractController {
     @GetMapping("/{id}/export")
     public ResponseEntity<byte[]> exportContract(@PathVariable Long id) {
         try {
-            byte[] pdfBytes = contractReportService.exportContract(id);
+            byte[] pdfBytes = jasperService.exportContract(id);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -54,7 +69,7 @@ public class ContractController {
     @PostMapping("/{id}/send-email")
     public ResponseEntity<ApiResponse<String>> sendContractEmail(@PathVariable Long id) {
         try {
-            contractReportService.exportAndSendContract(id);
+            jasperService.exportAndSendContract(id);
             return ResponseEntity.ok(ApiResponse.<String>builder()
                     .message("Email sent successfully")
                     .data("Contract has been sent to customer's email")

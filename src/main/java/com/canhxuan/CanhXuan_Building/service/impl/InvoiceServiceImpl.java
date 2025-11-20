@@ -13,6 +13,9 @@ import com.canhxuan.CanhXuan_Building.repository.InvoiceRepository;
 import com.canhxuan.CanhXuan_Building.repository.InvoiceServiceDetailRepository;
 import com.canhxuan.CanhXuan_Building.repository.ServiceRepository;
 import com.canhxuan.CanhXuan_Building.service.InvoiceService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,25 +37,28 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public ApiResponse<List<InvoiceResponse>> getAll() {
-        List<InvoiceResponse> invoiceResponses = invoiceRepository.findAll().stream()
-                .map(invoice -> {
-                    InvoiceResponse response = new InvoiceResponse();
-                    response.setId(invoice.getId());
-                    response.setContract(invoice.getContract());
-                    response.setInvoiceDate(invoice.getInvoiceDate());
-                    response.setDueDate(invoice.getDueDate());
-                    response.setRoomRent(invoice.getRoomRent());
-                    response.setTotalServiceFee(invoice.getTotalServiceFee());
-                    response.setTotalAmount(invoice.getTotalAmount());
-                    response.setStatus(invoice.getStatus());
-                    response.setNote(invoice.getNote());
-                    response.setPaidAt(invoice.getPaidAt());
-                    response.setServiceDetail(invoice.getServiceDetails());
-                    return response;
-                }).toList();
-        ApiResponse<List<InvoiceResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(invoiceResponses);
+    public ApiResponse<Page<InvoiceResponse>> getAll(Integer page) {
+        Pageable pageable = PageRequest.of(Math.max(0, page), 10);
+        ApiResponse<Page<InvoiceResponse>> apiResponse = new ApiResponse<>();
+
+        Page<Invoice> invoices = invoiceRepository.findAll(pageable);
+        Page<InvoiceResponse> responsePage = invoices.map(invoice -> {
+            InvoiceResponse response = new InvoiceResponse();
+            response.setId(invoice.getId());
+            response.setContract(invoice.getContract());
+            response.setInvoiceDate(invoice.getInvoiceDate());
+            response.setDueDate(invoice.getDueDate());
+            response.setRoomRent(invoice.getRoomRent());
+            response.setTotalServiceFee(invoice.getTotalServiceFee());
+            response.setTotalAmount(invoice.getTotalAmount());
+            response.setStatus(invoice.getStatus());
+            response.setNote(invoice.getNote());
+            response.setPaidAt(invoice.getPaidAt());
+            response.setServiceDetail(invoice.getServiceDetails());
+            return response;
+        });
+
+        apiResponse.setData(responsePage);
         apiResponse.setMessage("Get all invoices successfully");
         apiResponse.setSuccess(true);
         return apiResponse;
@@ -147,6 +153,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public ApiResponse<Void> delete(Long id) {
-        return null;
+        invoiceRepository.deleteById(id);
+        ApiResponse<Void> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Delete invoice successfully");
+        return apiResponse;
     }
 }

@@ -11,11 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-//    @ExceptionHandler(RuntimeException.class)
-//    ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
-//        ApiResponse<Void> response = new ApiResponse<>(false, ex.getMessage(), null);
-//        return ResponseEntity.badRequest().body(response);
-//    }
+    @ExceptionHandler(RuntimeException.class)
+    ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
+        ApiResponse<Void> response = new ApiResponse<>(false, ex.getMessage(), null);
+        return ResponseEntity.badRequest().body(response);
+    }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiResponse<Void>> handleResponseStatusException(ResponseStatusException ex) {

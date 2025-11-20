@@ -3,9 +3,15 @@ package com.canhxuan.CanhXuan_Building.controller;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Customer;
 import com.canhxuan.CanhXuan_Building.service.CustomerService;
+import com.canhxuan.CanhXuan_Building.service.impl.JasperService;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -13,20 +19,34 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final JasperService jasperService;
 
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, JasperService jasperService) {
         this.customerService = customerService;
+        this.jasperService = jasperService;
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Customer>>> getAll() {
-        return ResponseEntity.ok(customerService.getAll());
+    public ResponseEntity<ApiResponse<Page<Customer>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(customerService.getAll(page));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Customer>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.getById(id));
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportCustomersToExcel() throws Exception {
+        byte[] data = jasperService.exportCustomersToExcel();
+        String filename = "Danh_sach_khach_hang_" +
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(data);
     }
 
     @PostMapping

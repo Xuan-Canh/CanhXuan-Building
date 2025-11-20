@@ -26,7 +26,6 @@ public class InvoiceServiceDetail {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "service_id", nullable = false)
-    @JsonIgnore
     Service service;
 
     Double oldReading;

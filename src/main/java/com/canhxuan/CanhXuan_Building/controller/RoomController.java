@@ -7,6 +7,7 @@ import com.canhxuan.CanhXuan_Building.service.RoomService;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +32,8 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Room>>> getAll() {
-        return ResponseEntity.ok(roomService.getAll());
+    public ResponseEntity<ApiResponse<Page<Room>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(roomService.getAll(page));
     }
 
     @GetMapping("/search")

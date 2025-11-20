@@ -4,6 +4,9 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Customer;
 import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
 import com.canhxuan.CanhXuan_Building.service.CustomerService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +22,11 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public ApiResponse<List<Customer>> getAll() {
-        ApiResponse<List<Customer>> response = new ApiResponse<>();
+    public ApiResponse<Page<Customer>> getAll(Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        ApiResponse<Page<Customer>> response = new ApiResponse<>();
         response.setMessage("Get all customers successfully");
-        response.setData(customerRepository.findAll());
+        response.setData(customerRepository.findAll(pageable));
         return response;
     }
 

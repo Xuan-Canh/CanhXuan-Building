@@ -3,12 +3,13 @@ package com.canhxuan.CanhXuan_Building.service;
 
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Customer;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface CustomerService {
 
-    ApiResponse<List<Customer>> getAll();
+    ApiResponse<Page<Customer>> getAll(Integer page);
 
     ApiResponse<Customer> getById(Long id);
 

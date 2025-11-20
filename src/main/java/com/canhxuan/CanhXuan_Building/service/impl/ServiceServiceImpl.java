@@ -3,6 +3,9 @@ package com.canhxuan.CanhXuan_Building.service.impl;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.repository.ServiceRepository;
 import com.canhxuan.CanhXuan_Building.service.ServiceService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +21,10 @@ public class ServiceServiceImpl implements ServiceService {
 
 
     @Override
-    public ApiResponse<List<com.canhxuan.CanhXuan_Building.entity.Service>> getAll() {
-        ApiResponse<List<com.canhxuan.CanhXuan_Building.entity.Service>> response = new ApiResponse<>();
-        List<com.canhxuan.CanhXuan_Building.entity.Service> services = serviceRepository.findAll();
-        response.setData(services);
+    public ApiResponse<Page<com.canhxuan.CanhXuan_Building.entity.Service>> getAll(Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        ApiResponse<Page<com.canhxuan.CanhXuan_Building.entity.Service>> response = new ApiResponse<>();
+        response.setData(serviceRepository.findAll(pageable));
         response.setMessage("Get all services successfully");
         return response;
     }

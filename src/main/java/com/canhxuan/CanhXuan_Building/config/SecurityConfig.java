@@ -38,17 +38,29 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
+                        // Public endpoints
                         .requestMatchers("/canhxuan/auth/**").permitAll()
-                        .requestMatchers("/canhxuan/buildings/*/images/**").permitAll() // Cho phép tất cả
-                        .requestMatchers("/canhxuan/users",
+                        .requestMatchers("/canhxuan/buildings/*/images/**").permitAll()
+
+                        // USER and ADMIN endpoints
+                        .requestMatchers(
                                 "/canhxuan/buildings/**",
                                 "/canhxuan/rooms/**",
-                                "/canhxuan/customers",
-                                "/canhxuan/contracts",
+                                "/canhxuan/contracts/**",
                                 "/canhxuan/services",
-                                "/canhxuan/invoices").hasAuthority("ADMIN")
-                        .requestMatchers(USER_ENDPOINTS).hasAnyAuthority("USER", "ADMIN")
-                        .anyRequest().authenticated())
+                                "/canhxuan/invoices/**"
+                        ).hasAnyAuthority("USER", "ADMIN")
+
+                        // ADMIN only endpoints
+                        .requestMatchers(
+                                "/canhxuan/customers/**",
+                                "/canhxuan/services/**",
+                                "/canhxuan/users/**"
+                        ).hasAuthority("ADMIN")
+
+                        // Authenticated endpoints
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

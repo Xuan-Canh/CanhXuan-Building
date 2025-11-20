@@ -1,7 +1,9 @@
 package com.canhxuan.CanhXuan_Building.controller;
 
+import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.User;
 import com.canhxuan.CanhXuan_Building.service.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,28 +21,28 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<ApiResponse<Page<User>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(userService.findAll(page));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(Long id) {
+    public ResponseEntity<ApiResponse<User>> getById(Long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
 
     @PostMapping()
-    public ResponseEntity<User> create(@RequestBody User user) {
+    public ResponseEntity<ApiResponse<User>> create(@RequestBody User user) {
         return ResponseEntity.ok(userService.create(user));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody User user) {
-        return ResponseEntity.ok("Update feature has not been implemented yet");
+    public ResponseEntity<ApiResponse<User>> update(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.update(id, user));
     }
 
-    @DeleteMapping()
-    public ResponseEntity<String> delete(@RequestParam Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         userService.delete(id);
-        return ResponseEntity.ok("Delete successfully");
+        return ResponseEntity.ok(userService.delete(id));
     }
 }

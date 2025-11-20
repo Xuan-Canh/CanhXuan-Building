@@ -1,25 +1,93 @@
 package com.canhxuan.CanhXuan_Building.service.impl;
 
 import com.canhxuan.CanhXuan_Building.entity.Contract;
+import com.canhxuan.CanhXuan_Building.entity.Customer;
+import com.canhxuan.CanhXuan_Building.entity.Invoice;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
+import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
+import com.canhxuan.CanhXuan_Building.repository.InvoiceRepository;
 import com.canhxuan.CanhXuan_Building.utils.kafka.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class ContractReportService {
+public class JasperService {
 
     private final ContractRepository contractRepository;
     private final Producer producer;
+    private final CustomerRepository customerRepository;
+    private final InvoiceRepository invoiceRepository;
+
+    public byte[] exportCustomersToExcel() throws Exception {
+        List<Customer> customers = customerRepository.findAll();
+
+        InputStream inputStream = getClass().getResourceAsStream("/reports/customers_list.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(customers);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<>(), dataSource);
+
+        return exportToXlsx(jasperPrint);
+    }
+
+    public byte[] exportContractsToExcel() throws Exception {
+        List<Contract> contracts = contractRepository.findAll();
+
+        InputStream inputStream = getClass().getResourceAsStream("/reports/contracts_list.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(contracts);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<>(), dataSource);
+
+        return exportToXlsx(jasperPrint);
+    }
+
+    public byte[] exportInvoicesToExcel() throws Exception {
+        List<Invoice> invoices = invoiceRepository.findAll();
+
+        InputStream inputStream = getClass().getResourceAsStream("/reports/invoices_list.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(invoices);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<>(), dataSource);
+
+        return exportToXlsx(jasperPrint);
+    }
+
+    private byte[] exportToXlsx(JasperPrint jasperPrint) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        JRXlsxExporter exporter = new JRXlsxExporter();
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+
+        SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+        configuration.setOnePagePerSheet(false);
+        configuration.setDetectCellType(true);
+        configuration.setCollapseRowSpan(false);
+        configuration.setWhitePageBackground(false);
+
+        exporter.setConfiguration(configuration);
+        exporter.exportReport();
+
+        return outputStream.toByteArray();
+    }
+
 
     public byte[] exportContract(Long id) throws Exception {
         Contract contract = contractRepository.findById(id)

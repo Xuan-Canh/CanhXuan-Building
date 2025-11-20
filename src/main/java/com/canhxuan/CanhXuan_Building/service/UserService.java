@@ -1,18 +1,18 @@
 package com.canhxuan.CanhXuan_Building.service;
 
+import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.User;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface UserService {
 
-    List<User> findAll();
+    ApiResponse<Page<User>> findAll(Integer page);
 
-    User getById(Long id);
+    ApiResponse<User> getById(Long id);
 
-    User create(User user);
+    ApiResponse<User> create(User user);
 
-    User update(Long id, User user);
+    ApiResponse<User> update(Long id, User user);
 
-    void delete(Long id);
+    ApiResponse<Void> delete(Long id);
 }

@@ -8,6 +8,9 @@ import com.canhxuan.CanhXuan_Building.repository.BuildingRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomImageRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
 import com.canhxuan.CanhXuan_Building.service.RoomService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +35,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ApiResponse<List<Room>> getAll() {
-        ApiResponse<List<Room>> response = new ApiResponse<>();
+    public ApiResponse<Page<Room>> getAll(Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        ApiResponse<Page<Room>> response = new ApiResponse<>();
         response.setMessage("Get all rooms successfully");
-        response.setData(roomRepository.findAll());
+        response.setData(roomRepository.findAll(pageable));
         return response;
     }
 

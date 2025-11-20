@@ -3,6 +3,7 @@ package com.canhxuan.CanhXuan_Building.controller;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Service;
 import com.canhxuan.CanhXuan_Building.service.ServiceService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +20,8 @@ public class ServiceController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Service>>> getAll() {
-        return ResponseEntity.ok(serviceService.getAll());
+    public ResponseEntity<ApiResponse<Page<Service>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(serviceService.getAll(page));
     }
 
     @GetMapping("/{id}")

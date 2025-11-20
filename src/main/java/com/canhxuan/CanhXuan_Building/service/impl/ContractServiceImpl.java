@@ -10,6 +10,7 @@ import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
 import com.canhxuan.CanhXuan_Building.repository.UserRepository;
 import com.canhxuan.CanhXuan_Building.service.ContractService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,10 +32,13 @@ public class ContractServiceImpl implements ContractService {
 
 
     @Override
-    public ApiResponse<List<ContractResponse>> getAll() {
-        ApiResponse<List<ContractResponse>> response = new ApiResponse<>();
-        response.setMessage("Get all contracts successfully");
-        response.setData(contractRepository.findAll().stream().map(contract ->{
+    public ApiResponse<Page<ContractResponse>> getAll(Integer page) {
+        ApiResponse<Page<ContractResponse>> response = new ApiResponse<>();
+        int p = page == null ? 0 : Math.max(0, page);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(p, 10);
+
+        Page<Contract> contracts = contractRepository.findAll(pageable);
+        Page<ContractResponse> responsePage = contracts.map(contract -> {
             ContractResponse contractResponse = new ContractResponse();
             contractResponse.setId(contract.getId());
             contractResponse.setCustomer(contract.getCustomer());
@@ -47,7 +51,11 @@ public class ContractServiceImpl implements ContractService {
             contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
             contractResponse.setService(contract.getServices());
             return contractResponse;
-        }).collect(Collectors.toList()));
+        });
+
+        response.setData(responsePage);
+        response.setMessage("Get all contracts successfully");
+        response.setSuccess(true);
         return response;
     }
 
