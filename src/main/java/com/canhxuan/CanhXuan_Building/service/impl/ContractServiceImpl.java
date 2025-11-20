@@ -4,6 +4,7 @@ import com.canhxuan.CanhXuan_Building.dto.request.CreateContractDto;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.ContractResponse;
 import com.canhxuan.CanhXuan_Building.entity.Contract;
+import com.canhxuan.CanhXuan_Building.entity.ContractStatus;
 import com.canhxuan.CanhXuan_Building.entity.Customer;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
 import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
@@ -32,6 +33,28 @@ public class ContractServiceImpl implements ContractService {
 
 
     @Override
+    public ApiResponse<List<ContractResponse>> getAllContracts() {
+        ApiResponse<List<ContractResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Get all contracts successfully");
+        apiResponse.setData(contractRepository.findAll().stream().map(contract -> {
+            ContractResponse contractResponse = new ContractResponse();
+            contractResponse.setId(contract.getId());
+            contractResponse.setCustomer(contract.getCustomer());
+            contractResponse.setRoom(contract.getRoom());
+            contractResponse.setStartDate(contract.getStartDate());
+            contractResponse.setEndDate(contract.getEndDate());
+            contractResponse.setMonthlyRent(contract.getMonthlyRent());
+            contractResponse.setDepositAmount(contract.getDepositAmount());
+            contractResponse.setNote(contract.getNote());
+            contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
+            contractResponse.setService(contract.getServices());
+            return contractResponse;
+        }).collect(Collectors.toList()));
+        return apiResponse;
+    }
+
+    @Override
     public ApiResponse<Page<ContractResponse>> getAll(Integer page) {
         ApiResponse<Page<ContractResponse>> response = new ApiResponse<>();
         int p = page == null ? 0 : Math.max(0, page);
@@ -55,6 +78,34 @@ public class ContractServiceImpl implements ContractService {
 
         response.setData(responsePage);
         response.setMessage("Get all contracts successfully");
+        response.setSuccess(true);
+        return response;
+    }
+
+    @Override
+    public ApiResponse<Page<ContractResponse>> searchByName(String name, Integer page) {
+        ApiResponse<Page<ContractResponse>> response = new ApiResponse<>();
+        int p = page == null ? 0 : Math.max(0, page);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(p, 10);
+
+        Page<Contract> contracts = contractRepository.findByCustomerFullnameContainingIgnoreCase(name, pageable);
+        Page<ContractResponse> responsePage = contracts.map(contract -> {
+            ContractResponse contractResponse = new ContractResponse();
+            contractResponse.setId(contract.getId());
+            contractResponse.setCustomer(contract.getCustomer());
+            contractResponse.setRoom(contract.getRoom());
+            contractResponse.setStartDate(contract.getStartDate());
+            contractResponse.setEndDate(contract.getEndDate());
+            contractResponse.setMonthlyRent(contract.getMonthlyRent());
+            contractResponse.setDepositAmount(contract.getDepositAmount());
+            contractResponse.setNote(contract.getNote());
+            contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
+            contractResponse.setService(contract.getServices());
+            return contractResponse;
+        });
+
+        response.setData(responsePage);
+        response.setMessage("Search contracts by customer name successfully");
         response.setSuccess(true);
         return response;
     }
@@ -87,6 +138,7 @@ public class ContractServiceImpl implements ContractService {
         contract.setNote(dto.getNote());
         contract.setPaymentDueDate(dto.getPaymentDueDate());
         contract.setServices(dto.getServices());
+        contract.setStatus(ContractStatus.ACTIVE);
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Create contract successfully");
         response.setData(contractRepository.save(contract));

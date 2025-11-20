@@ -2,6 +2,7 @@ package com.canhxuan.CanhXuan_Building.dto.response;
 
 import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.entity.InvoiceServiceDetail;
+import com.canhxuan.CanhXuan_Building.entity.InvoiceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class InvoiceResponse {
     Double roomRent;
     Double totalServiceFee;
     Double totalAmount;
-    String status;
+    InvoiceStatus status;
     String note;
     LocalDateTime paidAt;
     List<InvoiceServiceDetail> serviceDetail;

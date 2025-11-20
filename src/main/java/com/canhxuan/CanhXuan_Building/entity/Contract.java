@@ -48,11 +48,8 @@ public class Contract {
 
     Integer paymentDueDate;
 
-    enum status {
-        ACTIVE,
-        TERMINATED,
-        EXPIRED
-    };
+    @Enumerated(EnumType.STRING)
+    ContractStatus status;
 
     String note;
 

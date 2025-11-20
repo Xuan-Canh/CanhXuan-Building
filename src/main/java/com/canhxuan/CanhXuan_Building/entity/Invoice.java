@@ -44,7 +44,8 @@ public class Invoice {
     @Column(nullable = false)
     Double totalAmount; // Tổng tiền
 
-    String status; // UNPAID, PAID, OVERDUE
+    @Enumerated(EnumType.STRING)
+    InvoiceStatus status; // UNPAID, PAID, OVERDUE
 
     LocalDateTime paidAt;
 

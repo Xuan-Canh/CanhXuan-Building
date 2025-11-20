@@ -31,6 +31,16 @@ public class ContractController {
         return ResponseEntity.ok(contractService.getAll(page));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<java.util.List<ContractResponse>>> getAllContracts() {
+        return ResponseEntity.ok(contractService.getAllContracts());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<ContractResponse>>> searchByName(String name, Integer page) {
+        return ResponseEntity.ok(contractService.searchByName(name, page));
+    }
+
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportContractsToExcel() throws Exception {
         byte[] data = jasperService.exportContractsToExcel();

@@ -34,7 +34,8 @@ public class Room {
     @Column(nullable = false)
     Double price;
 
-    String status;
+    @Enumerated(EnumType.STRING)
+    RoomStatus status;
 
     String description;
 

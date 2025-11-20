@@ -55,7 +55,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/canhxuan/customers/**",
                                 "/canhxuan/services/**",
-                                "/canhxuan/users/**"
+                                "/canhxuan/users/**",
+                                "/canhxuan/dashboard/**"
                         ).hasAuthority("ADMIN")
 
                         // Authenticated endpoints

@@ -14,7 +14,7 @@
     <field name="roomRent" class="java.lang.Double"/>
     <field name="totalServiceFee" class="java.lang.Double"/>
     <field name="totalAmount" class="java.lang.Double"/>
-    <field name="status" class="java.lang.String"/>
+    <field name="status" class="com.canhxuan.CanhXuan_Building.entity.InvoiceStatus"/>
     <field name="paidAt" class="java.time.LocalDateTime"/>
 
     <title>

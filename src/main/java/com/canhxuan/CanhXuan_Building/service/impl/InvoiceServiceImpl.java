@@ -4,10 +4,7 @@ import com.canhxuan.CanhXuan_Building.dto.request.InvoiceRequest;
 import com.canhxuan.CanhXuan_Building.dto.request.ServiceUsageDetail;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.InvoiceResponse;
-import com.canhxuan.CanhXuan_Building.entity.Contract;
-import com.canhxuan.CanhXuan_Building.entity.Invoice;
-import com.canhxuan.CanhXuan_Building.entity.InvoiceServiceDetail;
-import com.canhxuan.CanhXuan_Building.entity.ServiceType;
+import com.canhxuan.CanhXuan_Building.entity.*;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
 import com.canhxuan.CanhXuan_Building.repository.InvoiceRepository;
 import com.canhxuan.CanhXuan_Building.repository.InvoiceServiceDetailRepository;
@@ -95,6 +92,10 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Contract not found"));
         Invoice invoice = new Invoice();
         Invoice lastInvoice = invoiceRepository.findTopByContractIdOrderByInvoiceDateDesc(contract.getId());
+        if (lastInvoice == null) {
+            lastInvoice = new Invoice();
+            lastInvoice.setServiceDetails(new ArrayList<>());
+        }
         List<InvoiceServiceDetail> details = new ArrayList<>();
 
         for (ServiceUsageDetail usage : createInvoiceRequest.getServiceUsageDetails()){
@@ -125,7 +126,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setRoomRent(contract.getMonthlyRent());
         invoice.setTotalServiceFee(details.stream().mapToDouble(InvoiceServiceDetail::getAmount).sum());
         invoice.setTotalAmount(invoice.getRoomRent() + invoice.getTotalServiceFee());
-        invoice.setStatus("UNPAID");
+        invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setNote(createInvoiceRequest.getNote());
         Invoice saved = invoiceRepository.save(invoice);
         InvoiceResponse response = new InvoiceResponse();
