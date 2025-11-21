@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -149,6 +151,32 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public ApiResponse<InvoiceResponse> update(Long id, InvoiceRequest createInvoiceRequest) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse<InvoiceResponse> markAsPaid(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Invoice not found with id: " + id));
+        invoice.setStatus(InvoiceStatus.PAID);
+        invoice.setPaidAt(LocalDateTime.now());
+        invoice = invoiceRepository.save(invoice);
+        InvoiceResponse response = new InvoiceResponse();
+        response.setId(invoice.getId());
+        response.setContract(invoice.getContract());
+        response.setInvoiceDate(invoice.getInvoiceDate());
+        response.setDueDate(invoice.getDueDate());
+        response.setRoomRent(invoice.getRoomRent());
+        response.setTotalServiceFee(invoice.getTotalServiceFee());
+        response.setTotalAmount(invoice.getTotalAmount());
+        response.setStatus(invoice.getStatus());
+        response.setNote(invoice.getNote());
+        response.setPaidAt(invoice.getPaidAt());
+        response.setServiceDetail(invoice.getServiceDetails());
+        ApiResponse<InvoiceResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Mark invoice as paid successfully");
+        apiResponse.setData(response);
         return null;
     }
 

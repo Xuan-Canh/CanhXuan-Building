@@ -37,8 +37,9 @@ public class RoomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<Room>>> getByName(@RequestParam String name) {
-        return ResponseEntity.ok(roomService.getByName(name));
+    public ResponseEntity<ApiResponse<Page<Room>>> searchByBuildingNameOrBuildingAddress(@RequestParam(defaultValue = "") String keyword,
+                                                             @RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(roomService.searchByBuildingNameOrBuildingAddress(keyword, page));
     }
 
     @GetMapping("/building/{buildingId}")
@@ -57,7 +58,7 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}/images/{fileName:.+}")
-    public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
+    public ResponseEntity<Resource> serveImage(@PathVariable Long roomId, @PathVariable String fileName) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         Resource resource = new UrlResource(filePath.toUri());
 

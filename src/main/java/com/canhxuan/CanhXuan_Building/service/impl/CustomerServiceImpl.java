@@ -31,6 +31,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public ApiResponse<Page<Customer>> searchByFullnameOrCccd(String keyword, Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        ApiResponse<Page<Customer>> response = new ApiResponse<>();
+        response.setMessage("Search customers successfully");
+        response.setData(customerRepository.findByFullnameContainingIgnoreCaseOrCccdContaining(keyword, keyword, pageable));
+        return response;
+    }
+
+    @Override
     public ApiResponse<Customer> getById(Long id) {
         ApiResponse<Customer> response = new ApiResponse<>();
         response.setMessage("Get customer by id successfully");

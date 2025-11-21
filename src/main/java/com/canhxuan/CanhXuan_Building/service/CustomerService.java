@@ -11,6 +11,8 @@ public interface CustomerService {
 
     ApiResponse<Page<Customer>> getAll(Integer page);
 
+    ApiResponse<Page<Customer>> searchByFullnameOrCccd(String keyword, Integer page);
+
     ApiResponse<Customer> getById(Long id);
 
     ApiResponse<Customer> create(Customer customer);

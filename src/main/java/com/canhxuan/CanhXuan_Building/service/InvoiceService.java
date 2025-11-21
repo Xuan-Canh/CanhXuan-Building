@@ -12,5 +12,6 @@ public interface InvoiceService {
     ApiResponse<InvoiceResponse> getById(Long id);
     ApiResponse<InvoiceResponse> create(InvoiceRequest createInvoiceRequest);
     ApiResponse<InvoiceResponse> update(Long id, InvoiceRequest createInvoiceRequest);
+    ApiResponse<InvoiceResponse> markAsPaid(Long id);
     ApiResponse<Void> delete(Long id);
 }

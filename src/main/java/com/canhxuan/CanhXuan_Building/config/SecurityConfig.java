@@ -40,7 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         // Public endpoints
                         .requestMatchers("/canhxuan/auth/**").permitAll()
-                        .requestMatchers("/canhxuan/buildings/*/images/**").permitAll()
+                        .requestMatchers("/canhxuan/buildings/*/images/**",
+                                "/canhxuan/rooms/*/images/**").permitAll()
 
                         // USER and ADMIN endpoints
                         .requestMatchers(
@@ -48,7 +49,8 @@ public class SecurityConfig {
                                 "/canhxuan/rooms/**",
                                 "/canhxuan/contracts/**",
                                 "/canhxuan/services",
-                                "/canhxuan/invoices/**"
+                                "/canhxuan/invoices/**",
+                                "/canhxuan/invoices/*/**"
                         ).hasAnyAuthority("USER", "ADMIN")
 
                         // ADMIN only endpoints
@@ -72,7 +74,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);

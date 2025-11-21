@@ -83,12 +83,12 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public ApiResponse<Page<ContractResponse>> searchByName(String name, Integer page) {
+    public ApiResponse<Page<ContractResponse>> searchByFullnameOrCccd(String keyword, Integer page) {
         ApiResponse<Page<ContractResponse>> response = new ApiResponse<>();
         int p = page == null ? 0 : Math.max(0, page);
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(p, 10);
 
-        Page<Contract> contracts = contractRepository.findByCustomerFullnameContainingIgnoreCase(name, pageable);
+        Page<Contract> contracts = contractRepository.findByCustomerFullnameContainingIgnoreCaseOrCustomerCccdContaining(keyword, keyword, pageable);
         Page<ContractResponse> responsePage = contracts.map(contract -> {
             ContractResponse contractResponse = new ContractResponse();
             contractResponse.setId(contract.getId());

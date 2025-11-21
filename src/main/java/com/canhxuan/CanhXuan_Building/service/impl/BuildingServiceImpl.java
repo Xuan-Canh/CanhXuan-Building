@@ -32,7 +32,7 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     public ApiResponse<Page<Building>> getAll(int page) {
-        Pageable pageable = PageRequest.of(page, 8);
+        Pageable pageable = PageRequest.of(page, 9);
         ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Get all buildings successfully");
         apiResponse.setData(buildingRepository.findAll(pageable));
@@ -40,10 +40,11 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public ApiResponse<List<Building>> getByName(String name) {
-        ApiResponse<List<Building>> apiResponse = new ApiResponse<>();
+    public ApiResponse<Page<Building>> searchByNameOrAddress(String keyword, Integer page) {
+        Pageable pageable = PageRequest.of(page, 9);
+        ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Get buildings by name successfully");
-        apiResponse.setData(buildingRepository.findByName(name));
+        apiResponse.setData(buildingRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword, pageable));
         return apiResponse;
     }
 

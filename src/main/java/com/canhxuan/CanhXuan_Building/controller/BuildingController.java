@@ -39,8 +39,9 @@ public class BuildingController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<Building>>> getByName(@RequestParam String name) {
-        return ResponseEntity.ok(buildingService.getByName(name));
+    public ResponseEntity<ApiResponse<Page<Building>>> getByName(@RequestParam (defaultValue = "") String keyword,
+                                                                 @RequestParam (defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(buildingService.searchByNameOrAddress(keyword, page));
     }
 
     @GetMapping("/{id}")

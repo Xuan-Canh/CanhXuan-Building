@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContractRepository extends JpaRepository<Contract, Long> {
 
-    Page<Contract> findByCustomerFullnameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Contract> findByCustomerFullnameContainingIgnoreCaseOrCustomerCccdContaining(String fullname, String cccd, Pageable pageable);
 }
+
 

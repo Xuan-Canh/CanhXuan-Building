@@ -44,10 +44,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ApiResponse<List<Room>> getByName(String name) {
-        ApiResponse<List<Room>> response = new ApiResponse<>();
+    public ApiResponse<Page<Room>> searchByBuildingNameOrBuildingAddress(String keyword, Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        ApiResponse<Page<Room>> response = new ApiResponse<>();
         response.setMessage("Get rooms by name successfully");
-        response.setData(roomRepository.findByNameContaining(name));
+        response.setData(roomRepository.findByBuildingNameContainingIgnoreCaseOrBuildingAddressContainingIgnoreCase(keyword, keyword, pageable));
         return response;
     }
 

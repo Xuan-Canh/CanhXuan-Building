@@ -11,12 +11,12 @@ import java.util.List;
 
 public interface BuildingService {
     ApiResponse<Page<Building>> getAll(int page);
-    ApiResponse<List<Building>> getByName(String name);
+    ApiResponse<Page<Building>> searchByNameOrAddress(String keyword, Integer page);
     ApiResponse<Building> getById(Long id);
     ApiResponse<Building> create(Building building);
     ApiResponse<Building> update(Long id, Building building);
     ApiResponse<Void> delete(Long id);
-    public ApiResponse<BuildingImage> saveImage(Long buildingId, MultipartFile file) throws IOException;
-    public ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId);
-    public ApiResponse<Void> deleteImage(Long imageId);
+    ApiResponse<BuildingImage> saveImage(Long buildingId, MultipartFile file) throws IOException;
+    ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId);
+    ApiResponse<Void> deleteImage(Long imageId);
 }

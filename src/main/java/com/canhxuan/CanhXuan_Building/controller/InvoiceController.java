@@ -55,4 +55,8 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceService.create(invoiceRequest));
     }
 
+    @PatchMapping("/{id}/pay")
+    public ResponseEntity<ApiResponse<InvoiceResponse>> markAsPaid(@PathVariable Long id) {
+        return ResponseEntity.ok(invoiceService.markAsPaid(id));
+    }
 }

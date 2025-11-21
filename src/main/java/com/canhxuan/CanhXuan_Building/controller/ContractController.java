@@ -37,8 +37,8 @@ public class ContractController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<ContractResponse>>> searchByName(String name, Integer page) {
-        return ResponseEntity.ok(contractService.searchByName(name, page));
+    public ResponseEntity<ApiResponse<Page<ContractResponse>>> searchByName(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(contractService.searchByFullnameOrCccd(keyword, page));
     }
 
     @GetMapping("/export")

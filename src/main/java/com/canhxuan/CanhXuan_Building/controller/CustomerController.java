@@ -32,6 +32,11 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getAll(page));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<Customer>>> searchByFullnameOrCccd(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(customerService.searchByFullnameOrCccd(keyword, page));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Customer>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.getById(id));

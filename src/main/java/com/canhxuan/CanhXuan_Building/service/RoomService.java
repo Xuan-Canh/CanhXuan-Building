@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface RoomService {
     ApiResponse<Page<Room>> getAll(Integer page);
-    ApiResponse<List<Room>> getByName(String name);
+    ApiResponse<Page<Room>> searchByBuildingNameOrBuildingAddress(String keyword, Integer page);
     ApiResponse<List<Room>> getByBuildingId(Long buildingId);
     ApiResponse<Room> getById(Long id);
     ApiResponse<Room> create(Long buildingId, Room room);

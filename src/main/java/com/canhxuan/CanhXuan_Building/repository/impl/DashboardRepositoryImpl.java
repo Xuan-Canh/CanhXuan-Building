@@ -22,7 +22,7 @@
             SUM(CASE WHEN r.status = com.canhxuan.CanhXuan_Building.entity.RoomStatus.OCCUPIED THEN 1 ELSE 0 END),
             COUNT(DISTINCT c.id),
             SUM(CASE WHEN ct.status = com.canhxuan.CanhXuan_Building.entity.ContractStatus.ACTIVE THEN 1 ELSE 0 END),
-            CAST( COALESCE(SUM(CASE WHEN i.status = 'PAID'
+            CAST( COALESCE(SUM(CASE WHEN i.status = com.canhxuan.CanhXuan_Building.entity.InvoiceStatus.PAID
                 AND MONTH(i.paidAt) = MONTH(CURRENT_DATE)
                 AND YEAR(i.paidAt) = YEAR(CURRENT_DATE)
                 THEN i.totalAmount ELSE 0.0 END), 0.0) AS double),
