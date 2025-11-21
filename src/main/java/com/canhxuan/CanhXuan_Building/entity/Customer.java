@@ -10,7 +10,10 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "customers", indexes = @Index(name = "idx_customer_fullname", columnList = "fullname"))
+@Table(name = "customers", indexes ={
+        @Index(name = "idx_customer_fullname", columnList = "fullname"),
+        @Index(name = "idx_customer_cccd", columnList = "cccd")
+})
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
