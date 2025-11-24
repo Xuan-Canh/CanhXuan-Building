@@ -5,12 +5,10 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.LoginResponse;
 import com.canhxuan.CanhXuan_Building.dto.request.RegisterRequest;
 import com.canhxuan.CanhXuan_Building.service.AuthService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -44,5 +42,15 @@ public class AuthController {
     @PostMapping("/refresh-token")
     public ResponseEntity<Map<String, String>> refreshToken(@RequestBody String refreshToken) {
         return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> email) throws JsonProcessingException {
+        return ResponseEntity.ok(authService.forgotPassword(email.get("email")));
+    }
+
+    @GetMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestParam String token) {
+        return ResponseEntity.ok(authService.resetPassword(token));
     }
 }

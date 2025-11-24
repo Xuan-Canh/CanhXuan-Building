@@ -1,9 +1,11 @@
 package com.canhxuan.CanhXuan_Building.utils.kafka;
 
+import com.canhxuan.CanhXuan_Building.dto.request.MailDto;
 import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
 import com.canhxuan.CanhXuan_Building.service.impl.JasperService;
 import com.canhxuan.CanhXuan_Building.service.impl.EmailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -40,7 +42,10 @@ public class Consumer {
     }
 
     @KafkaListener(topics = "auth-topic", groupId = "CX-Apartment")
-    public void consumeAuthTopic(String message) {
-
+    public void consumeAuthTopic(String message) throws JsonProcessingException {
+        System.out.println("Received message in auth-topic: " + message);
+        MailDto mailDto = new ObjectMapper().readValue(message, MailDto.class);
+        emailService.sendEmail(mailDto.getTo(), mailDto.getSubject(), mailDto.getBody());
+        System.out.println("Email sent to: " + mailDto.getTo());
     }
 }

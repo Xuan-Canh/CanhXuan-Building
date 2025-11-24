@@ -38,4 +38,19 @@ public class EmailService {
             throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
     }
+
+    public void sendEmail(String toEmail, String subject, String body) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(body, true); // true indicates HTML content
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
+        }
+    }
 }

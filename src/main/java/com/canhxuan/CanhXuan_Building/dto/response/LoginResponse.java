@@ -15,4 +15,5 @@ public class LoginResponse {
     String role;
     String accessToken;
     String refreshToken;
+    String userAvatar;
 }
