@@ -35,8 +35,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ApiResponse<Page<Room>> getAll(Integer page) {
-        Pageable pageable = PageRequest.of(page, 10);
+    public ApiResponse<Page<Room>> getAll(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<Room>> response = new ApiResponse<>();
         response.setMessage("Get all rooms successfully");
         response.setData(roomRepository.findAll(pageable));

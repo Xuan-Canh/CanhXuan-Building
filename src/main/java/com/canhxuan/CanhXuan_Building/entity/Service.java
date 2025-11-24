@@ -1,6 +1,9 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,18 +22,21 @@ public class Service {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
+    @Size(min = 3, max = 100, message = "Service name must be between 3 and 100 characters")
     String name;
 
+    @Size(max = 500, message = "Description must not exceed 500 characters")
     String description;
 
-    @Column(nullable = false)
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     Double price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     ServiceType type; // METERED hoặc FIXED
 
+    @NotBlank(message = "Unit is required")
+    @Size(max = 20, message = "Unit must not exceed 20 characters")
     String unit; // Đơn vị (kWh, m³, người, phòng...)
 
     LocalDateTime createdAt;

@@ -32,8 +32,8 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<Room>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
-        return ResponseEntity.ok(roomService.getAll(page));
+    public ResponseEntity<ApiResponse<Page<Room>>> getAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(roomService.getAll(page, size));
     }
 
     @GetMapping("/search")

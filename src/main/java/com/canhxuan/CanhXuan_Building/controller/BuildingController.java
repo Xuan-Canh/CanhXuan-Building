@@ -3,7 +3,6 @@ package com.canhxuan.CanhXuan_Building.controller;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
-import com.canhxuan.CanhXuan_Building.service.BuildingImageService;
 import com.canhxuan.CanhXuan_Building.service.BuildingService;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.core.io.Resource;
@@ -27,20 +26,20 @@ public class BuildingController {
 
     private String uploadDir = "uploads/images/building/";
 
-    private final BuildingService  buildingService;
+    private final BuildingService buildingService;
 
     public BuildingController(BuildingService buildingService) {
         this.buildingService = buildingService;
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<Building>>> getAll(@RequestParam (defaultValue = "0") int page) {
-        return ResponseEntity.ok(buildingService.getAll(page));
+    public ResponseEntity<ApiResponse<Page<Building>>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "9") int size) {
+        return ResponseEntity.ok(buildingService.getAll(page, size));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<Building>>> getByName(@RequestParam (defaultValue = "") String keyword,
-                                                                 @RequestParam (defaultValue = "0") Integer page) {
+    public ResponseEntity<ApiResponse<Page<Building>>> getByName(@RequestParam(defaultValue = "") String keyword,
+                                                                 @RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(buildingService.searchByNameOrAddress(keyword, page));
     }
 

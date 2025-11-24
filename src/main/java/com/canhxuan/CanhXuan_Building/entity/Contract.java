@@ -3,6 +3,7 @@ package com.canhxuan.CanhXuan_Building.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,18 +41,27 @@ public class Contract implements Serializable {
     )
     List<Service> services;
 
+    @NotNull(message = "Start date is required")
     LocalDate startDate;
+    @NotNull(message = "End date is required")
     LocalDate endDate;
 
+    @NotNull(message = "Monthly rent is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Monthly rent must be greater than 0")
     Double monthlyRent;
 
+    @DecimalMin(value = "0.0", message = "Deposit amount must be non-negative")
     Double depositAmount;
 
+    @NotNull(message = "Payment due date is required")
+    @Min(value = 1, message = "Payment due date must be between 1 and 31")
+    @Max(value = 31, message = "Payment due date must be between 1 and 31")
     Integer paymentDueDate;
 
     @Enumerated(EnumType.STRING)
     ContractStatus status;
 
+    @Max(value = 500, message = "Note cannot exceed 500 characters")
     String note;
 
     LocalDateTime createdAt;

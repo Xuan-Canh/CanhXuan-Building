@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -22,21 +23,25 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Room name is required")
+    @Size(min = 1, max = 50, message = "Room name must be between 1 and 50 characters")
     String name;
 
-    @Column(nullable = false)
+    @Min(value = 1, message = "Floor number must be at least 1")
+    @Max(value = 100, message = "Floor number must not exceed 100")
     Integer floor;
 
-    @Column(nullable = false)
+    @Min(value = 1, message = "Capacity must be at least 1")
+    @Max(value = 9, message = "Capacity must not exceed 9")
     Integer capacity;
 
-    @Column(nullable = false)
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     Double price;
 
     @Enumerated(EnumType.STRING)
     RoomStatus status;
 
+    @Size(max = 500, message = "Description must not exceed 500 characters")
     String description;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)

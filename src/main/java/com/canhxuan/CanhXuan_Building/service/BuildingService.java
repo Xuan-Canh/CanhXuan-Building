@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BuildingService {
-    ApiResponse<Page<Building>> getAll(int page);
+    ApiResponse<Page<Building>> getAll(int page, int size);
     ApiResponse<Page<Building>> searchByNameOrAddress(String keyword, Integer page);
     ApiResponse<Building> getById(Long id);
     ApiResponse<Building> create(Building building);

@@ -3,7 +3,7 @@ package com.canhxuan.CanhXuan_Building.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -25,24 +25,27 @@ public class Customer {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false)
+    @Size(min = 3, max = 100, message = "Fullname must be between 3 and 100 characters")
     String fullname;
 
-    @Column(nullable = false)
+    @Pattern(regexp = "^[0-9]{9,12}$", message = "CCCD must be between 9 and 12 digits")
     String cccd;
 
-    @Column(nullable = false)
+    @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone number must be between 10 and 11 digits")
     String phone;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Email is required")
     @Email
     String email;
 
+    @Past(message = "Date of birth must be in the past")
     LocalDate dateOfBirth;
 
+    @Size(max = 200, message = "Address must not exceed 200 characters")
     String address;
 
-    String status;
+    @Enumerated(EnumType.STRING)
+    CustomerStatus status;
 
     String gender;
 

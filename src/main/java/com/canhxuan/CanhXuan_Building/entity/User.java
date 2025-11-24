@@ -34,6 +34,8 @@ public class User {
     String phone;
     String city;
 
+    String avatarUrl;
+
     @NotBlank(message = "Role is required")
     String role = "USER";
 }

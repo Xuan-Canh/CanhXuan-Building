@@ -14,10 +14,11 @@
     <field name="dateOfBirth" class="java.time.LocalDate"/>
     <field name="address" class="java.lang.String"/>
     <field name="gender" class="java.lang.String"/>
-    <field name="status" class="java.lang.String"/>
+    <field name="status" class="com.canhxuan.CanhXuan_Building.entity.CustomerStatus"/>
 
-    <title>
-        <band height="50">
+    <pageHeader>
+        <band height="50" splitType="Prevent">
+            <printWhenExpression><![CDATA[$V{PAGE_NUMBER} == 1]]></printWhenExpression>
             <staticText>
                 <reportElement x="0" y="10" width="802" height="30"/>
                 <textElement textAlignment="Center">
@@ -26,7 +27,7 @@
                 <text><![CDATA[DANH SÁCH KHÁCH HÀNG]]></text>
             </staticText>
         </band>
-    </title>
+    </pageHeader>
 
     <columnHeader>
         <band height="30">

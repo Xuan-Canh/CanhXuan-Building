@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface RoomService {
-    ApiResponse<Page<Room>> getAll(Integer page);
+    ApiResponse<Page<Room>> getAll(Integer page, Integer size);
     ApiResponse<Page<Room>> searchByBuildingNameOrBuildingAddress(String keyword, Integer page);
     ApiResponse<List<Room>> getByBuildingId(Long buildingId);
     ApiResponse<Room> getById(Long id);

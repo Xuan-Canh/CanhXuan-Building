@@ -31,8 +31,8 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public ApiResponse<Page<Building>> getAll(int page) {
-        Pageable pageable = PageRequest.of(page, 9);
+    public ApiResponse<Page<Building>> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Get all buildings successfully");
         apiResponse.setData(buildingRepository.findAll(pageable));
