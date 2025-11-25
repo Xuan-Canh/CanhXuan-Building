@@ -1,18 +1,21 @@
 package com.canhxuan.CanhXuan_Building.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+import java.util.List;
+
+@Getter
+@Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ApiResponse <T>{
-    boolean success;
+    boolean success = false;
     String message;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<String> errors;
     T data;
 }

@@ -1,5 +1,6 @@
 package com.canhxuan.CanhXuan_Building.service;
 
+import com.canhxuan.CanhXuan_Building.dto.request.CreateRoomRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Room;
 import com.canhxuan.CanhXuan_Building.entity.RoomImage;
@@ -14,7 +15,7 @@ public interface RoomService {
     ApiResponse<Page<Room>> searchByBuildingNameOrBuildingAddress(String keyword, Integer page);
     ApiResponse<List<Room>> getByBuildingId(Long buildingId);
     ApiResponse<Room> getById(Long id);
-    ApiResponse<Room> create(Long buildingId, Room room);
+    ApiResponse<Room> create(CreateRoomRequest roomRequest);
     ApiResponse<Room> update(Long id, Room room);
     ApiResponse<Void> delete(Long id);
     ApiResponse<RoomImage> saveImage(Long roomId, MultipartFile file) throws IOException;

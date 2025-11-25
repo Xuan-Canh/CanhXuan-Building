@@ -29,6 +29,7 @@ public class Customer {
     String fullname;
 
     @Pattern(regexp = "^[0-9]{9,12}$", message = "CCCD must be between 9 and 12 digits")
+    @Column(unique = true)
     String cccd;
 
     @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone number must be between 10 and 11 digits")

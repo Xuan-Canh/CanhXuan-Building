@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Room {
 
     @Id
@@ -25,6 +26,7 @@ public class Room {
 
     @NotBlank(message = "Room name is required")
     @Size(min = 1, max = 50, message = "Room name must be between 1 and 50 characters")
+    @Column(unique = true)
     String name;
 
     @Min(value = 1, message = "Floor number must be at least 1")

@@ -34,6 +34,7 @@ public class BuildingServiceImpl implements BuildingService {
     public ApiResponse<Page<Building>> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
         apiResponse.setMessage("Get all buildings successfully");
         apiResponse.setData(buildingRepository.findAll(pageable));
         return apiResponse;
@@ -43,6 +44,7 @@ public class BuildingServiceImpl implements BuildingService {
     public ApiResponse<Page<Building>> searchByNameOrAddress(String keyword, Integer page) {
         Pageable pageable = PageRequest.of(page, 9);
         ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
         apiResponse.setMessage("Get buildings by name successfully");
         apiResponse.setData(buildingRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword, pageable));
         return apiResponse;
@@ -51,6 +53,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public ApiResponse<Building> getById(Long id) {
         ApiResponse<Building> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
         apiResponse.setMessage("Get building by id successfully");
         apiResponse.setData(buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id)));
         return apiResponse;
@@ -59,6 +62,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public ApiResponse<Building> create(Building building) {
         ApiResponse<Building> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
         apiResponse.setMessage("Create building successfully");
         apiResponse.setData(buildingRepository.save(building));
         return apiResponse;
@@ -73,6 +77,7 @@ public class BuildingServiceImpl implements BuildingService {
         presentBuilding.setRooms(building.getRooms());
         presentBuilding.setFloors(building.getFloors());
         ApiResponse<Building> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
         apiResponse.setMessage("Update building successfully");
         apiResponse.setData(buildingRepository.save(presentBuilding));
         return apiResponse;
@@ -82,6 +87,7 @@ public class BuildingServiceImpl implements BuildingService {
     public ApiResponse<Void> delete(Long id) {
         Building building = buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id));
         ApiResponse<Void> response = new ApiResponse<>();
+        response.setSuccess(true);
         buildingRepository.delete(building);
         response.setMessage("Delete building successfully");
         return response;
@@ -106,6 +112,7 @@ public class BuildingServiceImpl implements BuildingService {
         buildingImage.setFilePath(filePath.toString());
         buildingImage.setFileType(file.getContentType());
         ApiResponse<BuildingImage> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Save image successfully");
         response.setData(buildingImageRepository.save(buildingImage));
         return response;
@@ -114,6 +121,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId) {
         ApiResponse response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Get images successfully");
         response.setData(buildingImageRepository.findByBuildingId(buildingId));
         return response;
@@ -128,6 +136,7 @@ public class BuildingServiceImpl implements BuildingService {
         try {
             Files.deleteIfExists(Paths.get(image.getFilePath()));
             buildingImageRepository.delete(image);
+            response.setSuccess(true);
             response.setMessage("Delete image successfully");
         } catch (IOException e) {
             throw new RuntimeException("Could not delete file: " + image.getFilePath(), e);

@@ -1,6 +1,7 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Contract implements Serializable {
 
     @Id
@@ -61,7 +63,7 @@ public class Contract implements Serializable {
     @Enumerated(EnumType.STRING)
     ContractStatus status;
 
-    @Max(value = 500, message = "Note cannot exceed 500 characters")
+
     String note;
 
     LocalDateTime createdAt;

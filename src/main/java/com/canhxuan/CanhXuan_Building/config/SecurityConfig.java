@@ -42,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/canhxuan/auth/**").permitAll()
                         .requestMatchers("/canhxuan/buildings/*/images/**",
                                 "/canhxuan/rooms/*/images/**",
-                                "/canhxuan/users/profile/*/image/**").permitAll()
+                                "/canhxuan/users/profile/*/image/**",
+                                "/canhxuan/users/profile/**").permitAll()
 
                         // USER and ADMIN endpoints
                         .requestMatchers(

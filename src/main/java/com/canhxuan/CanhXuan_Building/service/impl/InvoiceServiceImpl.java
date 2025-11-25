@@ -1,6 +1,7 @@
 package com.canhxuan.CanhXuan_Building.service.impl;
 
 import com.canhxuan.CanhXuan_Building.dto.request.InvoiceRequest;
+import com.canhxuan.CanhXuan_Building.dto.request.MailDto;
 import com.canhxuan.CanhXuan_Building.dto.request.ServiceUsageDetail;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.InvoiceResponse;
@@ -10,6 +11,9 @@ import com.canhxuan.CanhXuan_Building.repository.InvoiceRepository;
 import com.canhxuan.CanhXuan_Building.repository.InvoiceServiceDetailRepository;
 import com.canhxuan.CanhXuan_Building.repository.ServiceRepository;
 import com.canhxuan.CanhXuan_Building.service.InvoiceService;
+import com.canhxuan.CanhXuan_Building.utils.kafka.Producer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +31,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ContractRepository contractRepository;
     private final InvoiceServiceDetailRepository invoiceServiceDetailRepository;
     private final ServiceRepository serviceRepository;
+    private final Producer producer;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository, InvoiceServiceDetailRepository invoiceServiceDetailRepository, ServiceRepository serviceRepository) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository, InvoiceServiceDetailRepository invoiceServiceDetailRepository, ServiceRepository serviceRepository, Producer producer) {
         this.invoiceRepository = invoiceRepository;
         this.contractRepository = contractRepository;
         this.invoiceServiceDetailRepository = invoiceServiceDetailRepository;
         this.serviceRepository = serviceRepository;
+        this.producer = producer;
     }
 
     @Override
@@ -89,7 +95,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public ApiResponse<InvoiceResponse> create(InvoiceRequest createInvoiceRequest) {
+    public ApiResponse<InvoiceResponse> create(InvoiceRequest createInvoiceRequest) throws JsonProcessingException {
         Contract contract = contractRepository.findById(createInvoiceRequest.getContractId())
                 .orElseThrow(() -> new RuntimeException("Contract not found"));
         Invoice invoice = new Invoice();
@@ -131,6 +137,20 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setNote(createInvoiceRequest.getNote());
         Invoice saved = invoiceRepository.save(invoice);
+        String to = saved.getContract().getCustomer().getEmail();
+        String subject = "New Invoice";
+        String body = "Dear " + saved.getContract().getCustomer().getFullname() + ",\n\n" +
+                "Your new invoice has been created with the following details:\n" +
+                "Invoice Date: " + saved.getInvoiceDate() + "\n" +
+                "Due Date: " + saved.getDueDate() + "\n" +
+                "Room Rent: " + saved.getRoomRent() + "\n" +
+                "Total Service Fee: " + saved.getTotalServiceFee() + "\n" +
+                "Total Amount: " + saved.getTotalAmount() + "\n\n" +
+                "Please make the payment by the due date.\n\n" +
+                "Thank you.";
+        MailDto mailDto = new MailDto(to, subject, body);
+        String message = new ObjectMapper().writeValueAsString(mailDto);
+        producer.send("invoice-topic", message);
         InvoiceResponse response = new InvoiceResponse();
         response.setId(saved.getId());
         response.setContract(saved.getContract());

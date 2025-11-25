@@ -1,5 +1,6 @@
 package com.canhxuan.CanhXuan_Building.service.impl;
 
+import com.canhxuan.CanhXuan_Building.dto.request.CreateRoomRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.Room;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -38,6 +40,7 @@ public class RoomServiceImpl implements RoomService {
     public ApiResponse<Page<Room>> getAll(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         ApiResponse<Page<Room>> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Get all rooms successfully");
         response.setData(roomRepository.findAll(pageable));
         return response;
@@ -47,14 +50,16 @@ public class RoomServiceImpl implements RoomService {
     public ApiResponse<Page<Room>> searchByBuildingNameOrBuildingAddress(String keyword, Integer page) {
         Pageable pageable = PageRequest.of(page, 10);
         ApiResponse<Page<Room>> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Get rooms by name successfully");
-        response.setData(roomRepository.findByBuildingNameContainingIgnoreCaseOrBuildingAddressContainingIgnoreCase(keyword, keyword, pageable));
+        response.setData(roomRepository.findByNameContainingIgnoreCaseOrBuildingNameContainingIgnoreCaseOrBuildingAddressContainingIgnoreCase(keyword, keyword, keyword, pageable));
         return response;
     }
 
     @Override
     public ApiResponse<List<Room>> getByBuildingId(Long buildingId) {
         ApiResponse<List<Room>> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Get rooms by building id successfully");
         response.setData(roomRepository.findByBuildingId(buildingId));
         return response;
@@ -63,6 +68,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public ApiResponse<Room> getById(Long id) {
         ApiResponse<Room> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Get room by id successfully");
         response.setData(roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + id)));
@@ -70,13 +76,25 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ApiResponse<Room> create(Long buildingId, Room room) {
-        Building building = buildingRepository.findById(buildingId)
-                .orElseThrow(() -> new RuntimeException("Building not found with id: " + buildingId));
-
+    public ApiResponse<Room> create(CreateRoomRequest request) {
+        Building building = buildingRepository.findById(request.getBuildingId())
+                .orElseThrow(() -> new RuntimeException("Building not found with id: " + request.getBuildingId()));
+        building.getRoomList().stream().forEach(room -> {
+            if (room.getName().equalsIgnoreCase(request.getName())) {
+                throw new RuntimeException("Room name is already existed in this building");
+            }
+        });
+        Room room = new Room();
+        room.setName(request.getName());
+        room.setFloor(request.getFloor());
+        room.setCapacity(request.getCapacity());
+        room.setPrice(request.getPrice());
+        room.setStatus(request.getStatus());
         room.setBuilding(building);
+        room.setDescription(request.getDescription());
 
         ApiResponse<Room> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Create room successfully");
         response.setData(roomRepository.save(room));
         return response;
@@ -86,7 +104,13 @@ public class RoomServiceImpl implements RoomService {
     public ApiResponse<Room> update(Long id, Room room) {
         Room existingRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
-
+        Building building = buildingRepository.findById(existingRoom.getBuilding().getId()).get();
+        for (int i = 0; i < building.getRoomList().size(); i++) {
+            Room r = building.getRoomList().get(i);
+            if (r.getName().equalsIgnoreCase(room.getName()) && !r.getId().equals(id)) {
+                throw new RuntimeException("Room name is already existed in this building");
+            }
+        }
         existingRoom.setName(room.getName());
         existingRoom.setFloor(room.getFloor());
         existingRoom.setCapacity(room.getCapacity());
@@ -96,6 +120,7 @@ public class RoomServiceImpl implements RoomService {
 
         ApiResponse<Room> response = new ApiResponse<>();
         response.setMessage("Update room successfully");
+        response.setSuccess(true);
         response.setData(roomRepository.save(existingRoom));
         return response;
     }
@@ -104,10 +129,10 @@ public class RoomServiceImpl implements RoomService {
     public ApiResponse<Void> delete(Long id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
-
         roomRepository.delete(room);
 
         ApiResponse<Void> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Delete room successfully");
         return response;
     }
@@ -134,6 +159,7 @@ public class RoomServiceImpl implements RoomService {
         roomImage.setFileType(file.getContentType());
 
         ApiResponse<RoomImage> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Save image successfully");
         response.setData(roomImageRepository.save(roomImage));
         return response;
@@ -143,6 +169,7 @@ public class RoomServiceImpl implements RoomService {
     public ApiResponse<List<RoomImage>> findImagesByRoomId(Long roomId) {
         ApiResponse<List<RoomImage>> response = new ApiResponse<>();
         response.setMessage("Get room images successfully");
+        response.setSuccess(true);
         response.setData(roomImageRepository.findByRoomId(roomId));
         return response;
     }
@@ -161,7 +188,7 @@ public class RoomServiceImpl implements RoomService {
         } catch (IOException e) {
             throw new RuntimeException("Could not delete file: " + roomImage.getFilePath(), e);
         }
-
+        response.setSuccess(true);
         return response;
     }
 }

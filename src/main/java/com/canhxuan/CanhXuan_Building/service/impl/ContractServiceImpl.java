@@ -3,9 +3,7 @@ package com.canhxuan.CanhXuan_Building.service.impl;
 import com.canhxuan.CanhXuan_Building.dto.request.CreateContractDto;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.ContractResponse;
-import com.canhxuan.CanhXuan_Building.entity.Contract;
-import com.canhxuan.CanhXuan_Building.entity.ContractStatus;
-import com.canhxuan.CanhXuan_Building.entity.Customer;
+import com.canhxuan.CanhXuan_Building.entity.*;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
 import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
@@ -121,6 +119,11 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public ApiResponse<Contract> create(CreateContractDto dto) {
+        Room room = roomRepository.findById(dto.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + dto.getRoomId()));
+        if (room.getStatus().equals(RoomStatus.OCCUPIED) || room.getStatus().equals(RoomStatus.MAINTENANCE)) {
+            throw new RuntimeException("Room is not available for new contract");
+        }
         Contract contract = new Contract();
         Optional<Customer> customerOptional = customerRepository.findByCccd(dto.getCustomer().getCccd());
         if(customerOptional.isEmpty()){
@@ -130,7 +133,7 @@ public class ContractServiceImpl implements ContractService {
         } else {
             contract.setCustomer(customerOptional.get());
         }
-        contract.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow(() -> new RuntimeException("Room not found with id: " + dto.getRoomId())));
+        contract.setRoom(room);
         contract.setStartDate(dto.getStartDate());
         contract.setEndDate(dto.getEndDate());
         contract.setMonthlyRent(dto.getMonthlyRent());
@@ -142,6 +145,8 @@ public class ContractServiceImpl implements ContractService {
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Create contract successfully");
         response.setData(contractRepository.save(contract));
+        room.setStatus(RoomStatus.OCCUPIED);
+        roomRepository.save(room);
         return response;
     }
 

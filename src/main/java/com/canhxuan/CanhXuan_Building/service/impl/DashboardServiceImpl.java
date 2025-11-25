@@ -19,7 +19,7 @@ public class DashboardServiceImpl implements DashboardService {
     public ApiResponse<DashboardDto> getDashboard() {
         DashboardDto dashboardData = dashboardRepository.getDashboard();
         if (dashboardData != null) {
-            return new ApiResponse<>(true, "Dashboard data retrieved successfully", dashboardData);
+            return new ApiResponse<>(true, "Dashboard data retrieved successfully", null, dashboardData);
         }
         return null;
     }

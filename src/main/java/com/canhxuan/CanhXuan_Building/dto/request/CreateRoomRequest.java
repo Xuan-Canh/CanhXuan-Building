@@ -1,5 +1,6 @@
 package com.canhxuan.CanhXuan_Building.dto.request;
 
+import com.canhxuan.CanhXuan_Building.entity.RoomStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class CreateRoomRequest {
     int floor;
     int capacity;
     double price;
-    String status;
+    RoomStatus status;
     String description;
     List<String> imageUrls;
     Long buildingId;

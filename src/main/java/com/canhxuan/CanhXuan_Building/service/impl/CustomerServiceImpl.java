@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -25,6 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
     public ApiResponse<Page<Customer>> getAll(Integer page) {
         Pageable pageable = PageRequest.of(page, 10);
         ApiResponse<Page<Customer>> response = new ApiResponse<>();
+        response.setSuccess(true);
         response.setMessage("Get all customers successfully");
         response.setData(customerRepository.findAll(pageable));
         return response;
@@ -35,6 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
         Pageable pageable = PageRequest.of(page, 10);
         ApiResponse<Page<Customer>> response = new ApiResponse<>();
         response.setMessage("Search customers successfully");
+        response.setSuccess(true);
         response.setData(customerRepository.findByFullnameContainingIgnoreCaseOrCccdContaining(keyword, keyword, pageable));
         return response;
     }
@@ -43,14 +46,20 @@ public class CustomerServiceImpl implements CustomerService {
     public ApiResponse<Customer> getById(Long id) {
         ApiResponse<Customer> response = new ApiResponse<>();
         response.setMessage("Get customer by id successfully");
+        response.setSuccess(true);
         response.setData(customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found with id: " + id)));
         return response;
     }
 
     @Override
     public ApiResponse<Customer> create(Customer customer) {
+        Optional<Customer> existingCustomer = customerRepository.findByCccd(customer.getCccd());
+        if (existingCustomer.isPresent()) {
+            throw new RuntimeException("Customer with CCCD " + customer.getCccd() + " already exists");
+        }
         ApiResponse<Customer> response = new ApiResponse<>();
         response.setMessage("Create customer successfully");
+        response.setSuccess(true);
         response.setData(customerRepository.save(customer));
         return response;
     }
@@ -68,6 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
         currentCustomer.setGender(customer.getGender());
         ApiResponse<Customer> response = new ApiResponse<>();
         response.setMessage("Update customer successfully");
+        response.setSuccess(true);
         response.setData(customerRepository.save(currentCustomer));
         return response;
     }
@@ -78,6 +88,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
         customerRepository.delete(customer);
+        response.setSuccess(true);
         response.setMessage("Delete customer successfully");
         return response;
     }

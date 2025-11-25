@@ -48,4 +48,12 @@ public class Consumer {
         emailService.sendEmail(mailDto.getTo(), mailDto.getSubject(), mailDto.getBody());
         System.out.println("Email sent to: " + mailDto.getTo());
     }
+
+    @KafkaListener(topics = "invoice-topic", groupId = "CX-Apartment")
+    public void consumeInvoiceTopic(String message) throws JsonProcessingException {
+        System.out.println("Received message in invoice-topic: " + message);
+        MailDto mailDto = new ObjectMapper().readValue(message, MailDto.class);
+        emailService.sendEmail(mailDto.getTo(), mailDto.getSubject(), mailDto.getBody());
+        System.out.println("Email sent to: " + mailDto.getTo());
+    }
 }

@@ -5,6 +5,7 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.InvoiceResponse;
 import com.canhxuan.CanhXuan_Building.service.InvoiceService;
 import com.canhxuan.CanhXuan_Building.service.impl.JasperService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -51,7 +52,7 @@ public class InvoiceController {
 
 
     @PostMapping
-    public ResponseEntity<ApiResponse<InvoiceResponse>> create(@RequestBody InvoiceRequest invoiceRequest) {
+    public ResponseEntity<ApiResponse<InvoiceResponse>> create(@RequestBody InvoiceRequest invoiceRequest) throws JsonProcessingException {
         return ResponseEntity.ok(invoiceService.create(invoiceRequest));
     }
 

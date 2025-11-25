@@ -1,9 +1,7 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -31,11 +29,15 @@ public class User {
     @Email(message = "Email is not valid")
     String email;
 
+    @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone number must be 10 to 11 digits")
     String phone;
+
+
     String city;
 
     String avatarUrl;
 
-    @NotBlank(message = "Role is required")
-    String role = "USER";
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    Role role = Role.USER;
 }

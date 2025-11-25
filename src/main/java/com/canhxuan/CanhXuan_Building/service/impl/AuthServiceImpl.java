@@ -50,20 +50,27 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public String register(RegisterRequest request) {
-        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
-        if (userOpt.isPresent()) {
-            return "Username already exists, please try another username";
+    public ApiResponse<Void> register(RegisterRequest request) {
+        ApiResponse<Void> response = new ApiResponse<>();
+        try {
+            Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+            if (userOpt.isPresent()) {
+                throw new RuntimeException("Username is already taken");
+            }
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setEmail(request.getEmail());
+            user.setPhone(request.getPhone());
+            user.setCity(request.getCity());
+//        user.setRole("ADMIN");
+            userRepository.save(user);
+            response.setSuccess(true);
+            response.setMessage("Register successfully");
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("Register failed: " + e.getMessage());
         }
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setPhone(request.getPhone());
-        user.setCity(request.getCity());
-        user.setRole("ADMIN");
-        userRepository.save(user);
-        return "Register successfully";
     }
 
     @Override
@@ -82,23 +89,23 @@ public class AuthServiceImpl implements AuthService {
             loginResponse.setUsername(request.getUsername().toLowerCase());
             loginResponse.setAccessToken(accessToken);
             loginResponse.setRefreshToken(refreshToken);
-            User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+            User user = userRepository.findByUsername(request.getUsername()).get();
             loginResponse.setUserAvatar(user.getAvatarUrl());
             response.setSuccess(true);
             response.setMessage("Login successfully, welcome " + request.getUsername());
             response.setData(loginResponse);
-            redisService.saveRefreshToken(refreshToken, request.getUsername().toLowerCase(), 60 * 24 * 7);
             return response;
         } catch (BadCredentialsException e) {
-            throw e;
+            throw new BadCredentialsException("Invalid username or password");
         }
     }
 
     @Override
     public ApiResponse<Void> logout(String token) {
         ApiResponse<Void> response = new ApiResponse<>();
-        response.setMessage("Logout successfully");
         redisService.blackListToken(token, 15);
+        response.setSuccess(true);
+        response.setMessage("Logout successfully");
         return response;
     }
 
@@ -108,10 +115,6 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Refresh token is invalid");
         }
         String username = jwtUtil.getUsernameFromToken(refreshToken);
-        String tokenValue = redisService.getValue("refresh: " + refreshToken);
-        if (!username.equals(tokenValue)) {
-            throw new RuntimeException("Refresh token is invalid");
-        }
         String newAccessToken = jwtUtil.generateAccessTokenByRefreshToken(refreshToken);
         return Map.of("accessToken", newAccessToken);
     }

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Map;
 
 public interface AuthService {
-    String register(RegisterRequest request);
+    ApiResponse<Void> register(RegisterRequest request);
     ApiResponse<LoginResponse> login(LoginRequest request);
     ApiResponse<Void> logout(String token);
     Map<String, String> refreshToken(String refreshToken);

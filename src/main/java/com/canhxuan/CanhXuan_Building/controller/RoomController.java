@@ -1,5 +1,6 @@
 package com.canhxuan.CanhXuan_Building.controller;
 
+import com.canhxuan.CanhXuan_Building.dto.request.CreateRoomRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Room;
 import com.canhxuan.CanhXuan_Building.entity.RoomImage;
@@ -74,9 +75,9 @@ public class RoomController {
                 .body(resource);
     }
 
-    @PostMapping("/building/{buildingId}")
-    public ResponseEntity<ApiResponse<Room>> create(@PathVariable Long buildingId, @RequestBody Room room) {
-        return ResponseEntity.ok(roomService.create(buildingId, room));
+    @PostMapping
+    public ResponseEntity<ApiResponse<Room>> create(@RequestBody CreateRoomRequest request) {
+        return ResponseEntity.ok(roomService.create(request));
     }
 
     @PostMapping("/{roomId}/images")
