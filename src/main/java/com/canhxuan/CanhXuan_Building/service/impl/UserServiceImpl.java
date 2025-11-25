@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
         ApiResponse<Page<User>> response = new ApiResponse<>();
         response.setMessage("Get all users successfully");
         response.setData(userRepository.findAll(pageable));
+        response.setSuccess(true);
         return response;
     }
 
@@ -43,6 +44,7 @@ public class UserServiceImpl implements UserService {
         ApiResponse<User> response = new ApiResponse<>();
         response.setMessage("Get user successfully");
         response.setData(userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found with id: " + username)));
+        response.setSuccess(true);
         return response;
     }
 
@@ -52,6 +54,7 @@ public class UserServiceImpl implements UserService {
         ApiResponse<User> response = new ApiResponse<>();
         response.setMessage("Create user successfully");
         response.setData(userRepository.save(user));
+        response.setSuccess(true);
         return response;
     }
 
@@ -85,6 +88,7 @@ public class UserServiceImpl implements UserService {
         presentUser.setRole(user.getRole());
         response.setMessage("Update user successfully");
         response.setData(userRepository.save(presentUser));
+        response.setSuccess(true);
         return response;
     }
 
@@ -98,6 +102,7 @@ public class UserServiceImpl implements UserService {
         ApiResponse<User> response = new ApiResponse<>();
         response.setMessage("Edit profile successfully");
         response.setData(userRepository.save(presentUser));
+        response.setSuccess(true);
         return response;
     }
 
@@ -108,6 +113,7 @@ public class UserServiceImpl implements UserService {
         ApiResponse<Void> response = new ApiResponse<>();
         response.setMessage("Delete user successfully");
         userRepository.delete(user);
+        response.setSuccess(true);
         return response;
     }
 }

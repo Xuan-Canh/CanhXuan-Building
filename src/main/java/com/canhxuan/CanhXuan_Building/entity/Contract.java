@@ -63,6 +63,9 @@ public class Contract implements Serializable {
     @Enumerated(EnumType.STRING)
     ContractStatus status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
 
     String note;
 

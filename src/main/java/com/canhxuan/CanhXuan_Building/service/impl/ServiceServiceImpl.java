@@ -25,6 +25,7 @@ public class ServiceServiceImpl implements ServiceService {
         Pageable pageable = PageRequest.of(page, 10);
         ApiResponse<Page<com.canhxuan.CanhXuan_Building.entity.Service>> response = new ApiResponse<>();
         response.setData(serviceRepository.findAll(pageable));
+        response.setSuccess(true);
         response.setMessage("Get all services successfully");
         return response;
     }
@@ -35,6 +36,7 @@ public class ServiceServiceImpl implements ServiceService {
         com.canhxuan.CanhXuan_Building.entity.Service service = serviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found with id: " + id));
         response.setData(service);
+        response.setSuccess(true);
         response.setMessage("Get service successfully");
         return response;
     }
@@ -45,6 +47,7 @@ public class ServiceServiceImpl implements ServiceService {
         com.canhxuan.CanhXuan_Building.entity.Service savedService = serviceRepository.save(service);
         response.setData(savedService);
         response.setMessage("Create service successfully");
+        response.setSuccess(true);
         return response;
     }
 
@@ -61,6 +64,7 @@ public class ServiceServiceImpl implements ServiceService {
         com.canhxuan.CanhXuan_Building.entity.Service updatedService = serviceRepository.save(existingService);
         response.setData(updatedService);
         response.setMessage("Update service successfully");
+        response.setSuccess(true);
         return response;
     }
 
@@ -72,6 +76,7 @@ public class ServiceServiceImpl implements ServiceService {
 
         serviceRepository.delete(existingService);
         response.setMessage("Delete service successfully");
+        response.setSuccess(true);
         return response;
     }
 }

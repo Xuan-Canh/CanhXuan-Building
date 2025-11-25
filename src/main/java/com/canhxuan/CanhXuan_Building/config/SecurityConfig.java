@@ -45,23 +45,23 @@ public class SecurityConfig {
                                 "/canhxuan/users/profile/*/image/**",
                                 "/canhxuan/users/profile/**").permitAll()
 
-                        // USER and ADMIN endpoints
-                        .requestMatchers(
-                                "/canhxuan/buildings/**",
-                                "/canhxuan/rooms/**",
-                                "/canhxuan/contracts/**",
-                                "/canhxuan/services",
-                                "/canhxuan/invoices/**",
-                                "/canhxuan/invoices/*/**"
-                        ).hasAnyAuthority("USER", "ADMIN")
-
-                        // ADMIN only endpoints
-                        .requestMatchers(
-                                "/canhxuan/customers/**",
-                                "/canhxuan/services/**",
-                                "/canhxuan/users/**",
-                                "/canhxuan/dashboard/**"
-                        ).hasAuthority("ADMIN")
+//                        // USER and ADMIN endpoints
+//                        .requestMatchers(
+//                                "/canhxuan/buildings/**",
+//                                "/canhxuan/rooms/**",
+//                                "/canhxuan/contracts/**",
+//                                "/canhxuan/services",
+//                                "/canhxuan/invoices/**",
+//                                "/canhxuan/invoices/*/**"
+//                        ).hasAnyAuthority("USER", "ADMIN")
+//
+//                        // ADMIN only endpoints
+//                        .requestMatchers(
+//                                "/canhxuan/customers/**",
+//                                "/canhxuan/services/**",
+//                                "/canhxuan/users/**",
+//                                "/canhxuan/dashboard/**"
+//                        ).hasAuthority("ADMIN")
 
                         // Authenticated endpoints
                         .anyRequest().authenticated()

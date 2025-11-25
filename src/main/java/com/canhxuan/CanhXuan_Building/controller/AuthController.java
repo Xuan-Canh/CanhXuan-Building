@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> email) throws JsonProcessingException {
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@RequestBody Map<String, String> email) throws JsonProcessingException {
         return ResponseEntity.ok(authService.forgotPassword(email.get("email")));
     }
 

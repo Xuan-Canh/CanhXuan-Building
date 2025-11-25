@@ -29,7 +29,7 @@ public class User {
     @Email(message = "Email is not valid")
     String email;
 
-    @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone number must be 10 to 11 digits")
+    @Pattern(regexp = "^$|^[0-9]{10,11}$", message = "Phone number must be 10 to 11 digits")
     String phone;
 
 

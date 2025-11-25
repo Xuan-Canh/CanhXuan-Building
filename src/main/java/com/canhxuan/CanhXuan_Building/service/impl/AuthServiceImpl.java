@@ -52,25 +52,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ApiResponse<Void> register(RegisterRequest request) {
         ApiResponse<Void> response = new ApiResponse<>();
-        try {
-            Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
-            if (userOpt.isPresent()) {
-                throw new RuntimeException("Username is already taken");
-            }
-            User user = new User();
-            user.setUsername(request.getUsername());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setEmail(request.getEmail());
-            user.setPhone(request.getPhone());
-            user.setCity(request.getCity());
-//        user.setRole("ADMIN");
-            userRepository.save(user);
-            response.setSuccess(true);
-            response.setMessage("Register successfully");
-            return response;
-        } catch (Exception e) {
-            throw new RuntimeException("Register failed: " + e.getMessage());
+        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+        if (userOpt.isPresent()) {
+            throw new RuntimeException("Username is already taken");
         }
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setCity(request.getCity());
+//        user.setRole("ADMIN");
+        userRepository.save(user);
+        response.setSuccess(true);
+        response.setMessage("Register successfully");
+        return response;
     }
 
     @Override
@@ -120,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Map<String, String> forgotPassword(String email) throws JsonProcessingException {
+    public ApiResponse<Void> forgotPassword(String email) throws JsonProcessingException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email not found"));
         String token = UUID.randomUUID().toString();
@@ -136,7 +132,10 @@ public class AuthServiceImpl implements AuthService {
         MailDto mailDto = new MailDto(email, subject, body);
         String message = new ObjectMapper().writeValueAsString(mailDto);
         producer.send("auth-topic", message);
-        return Map.of("message", "Password reset link has been sent to your email");
+        ApiResponse<Void> response = new ApiResponse<>();
+        response.setSuccess(true);
+        response.setMessage("Password reset link has been sent to your email");
+        return response;
     }
 
     @Override

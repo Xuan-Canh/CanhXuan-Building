@@ -13,6 +13,6 @@ public interface AuthService {
     ApiResponse<LoginResponse> login(LoginRequest request);
     ApiResponse<Void> logout(String token);
     Map<String, String> refreshToken(String refreshToken);
-    Map<String, String> forgotPassword(String email) throws JsonProcessingException;
+    ApiResponse<Void> forgotPassword(String email) throws JsonProcessingException;
     Map<String, String> resetPassword(String token);
 }

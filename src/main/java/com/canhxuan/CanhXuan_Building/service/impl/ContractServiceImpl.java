@@ -9,6 +9,7 @@ import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
 import com.canhxuan.CanhXuan_Building.repository.UserRepository;
 import com.canhxuan.CanhXuan_Building.service.ContractService;
+import com.canhxuan.CanhXuan_Building.utils.AuthHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,13 @@ public class ContractServiceImpl implements ContractService {
     private final ContractRepository contractRepository;
     private final CustomerRepository customerRepository;
     private final RoomRepository roomRepository;
+    private final AuthHelper authHelper;
 
-    public ContractServiceImpl(ContractRepository contractRepository, UserRepository userRepository, CustomerRepository customerRepository, RoomRepository roomRepository) {
+    public ContractServiceImpl(ContractRepository contractRepository, UserRepository userRepository, CustomerRepository customerRepository, RoomRepository roomRepository, AuthHelper authHelper) {
         this.contractRepository = contractRepository;
         this.customerRepository = customerRepository;
         this.roomRepository = roomRepository;
+        this.authHelper = authHelper;
     }
 
 
@@ -54,11 +57,22 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public ApiResponse<Page<ContractResponse>> getAll(Integer page) {
+        authHelper.requirePermission(Permission.CONTRACT_READ_ALL, Permission.CONTRACT_READ_OWN);
+
+        User currentUser = authHelper.getCurrentUser();
+
         ApiResponse<Page<ContractResponse>> response = new ApiResponse<>();
         int p = page == null ? 0 : Math.max(0, page);
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(p, 10);
 
-        Page<Contract> contracts = contractRepository.findAll(pageable);
+        Page<Contract> contracts;
+
+        if (currentUser.getRole().hasPermission(Permission.CONTRACT_READ_ALL)) {
+            contracts = contractRepository.findAll(pageable);
+        } else {
+            contracts = contractRepository.findByCreatedBy(currentUser, pageable);
+        }
+
         Page<ContractResponse> responsePage = contracts.map(contract -> {
             ContractResponse contractResponse = new ContractResponse();
             contractResponse.setId(contract.getId());
@@ -112,6 +126,7 @@ public class ContractServiceImpl implements ContractService {
     public ApiResponse<Contract> getById(Long id) {
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Get contract successfully");
+        response.setSuccess(true);
         response.setData(contractRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id)));
         return response;
@@ -144,6 +159,7 @@ public class ContractServiceImpl implements ContractService {
         contract.setStatus(ContractStatus.ACTIVE);
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Create contract successfully");
+        response.setSuccess(true);
         response.setData(contractRepository.save(contract));
         room.setStatus(RoomStatus.OCCUPIED);
         roomRepository.save(room);
@@ -154,6 +170,16 @@ public class ContractServiceImpl implements ContractService {
     public ApiResponse<Contract> update(Long id, Contract contract) {
         Contract currentContract = contractRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
+        Customer currentCustomer = customerRepository.findById(contract.getCustomer().getId())
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + contract.getCustomer().getCccd()));
+        currentCustomer.setCccd(contract.getCustomer().getCccd());
+        currentCustomer.setFullname(contract.getCustomer().getFullname());
+        currentCustomer.setEmail(contract.getCustomer().getEmail());
+        currentCustomer.setPhone(contract.getCustomer().getPhone());
+        currentCustomer.setDateOfBirth(contract.getCustomer().getDateOfBirth());
+        currentCustomer.setAddress(contract.getCustomer().getAddress());
+        currentCustomer.setGender(contract.getCustomer().getGender());
+        customerRepository.save(currentCustomer);
         currentContract.setStartDate(contract.getStartDate());
         currentContract.setEndDate(contract.getEndDate());
         currentContract.setMonthlyRent(contract.getMonthlyRent());
@@ -161,9 +187,10 @@ public class ContractServiceImpl implements ContractService {
         currentContract.setNote(contract.getNote());
         currentContract.setPaymentDueDate(contract.getPaymentDueDate());
         currentContract.setServices(contract.getServices());
-        currentContract.setCustomer(contract.getCustomer());
+        currentContract.setCustomer(currentCustomer);
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Update contract successfully");
+        response.setSuccess(true);
         response.setData(contractRepository.save(currentContract));
         return response;
     }
@@ -175,6 +202,7 @@ public class ContractServiceImpl implements ContractService {
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
         contractRepository.delete(contract);
         response.setMessage("Delete contract successfully");
+        response.setSuccess(true);
         return response;
     }
 }
