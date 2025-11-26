@@ -24,7 +24,7 @@ public class ContractResponse {
     double monthlyRent;
     int paymentDueDate;
     String note;
-    Customer customer;
-    Room room;
-    List<Service> service;
+    CustomerDTO customer;
+    RoomDTO room;
+    List<ServiceDTO> service;
 }

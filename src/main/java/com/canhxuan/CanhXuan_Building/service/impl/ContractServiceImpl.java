@@ -1,8 +1,7 @@
 package com.canhxuan.CanhXuan_Building.service.impl;
 
 import com.canhxuan.CanhXuan_Building.dto.request.CreateContractDto;
-import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
-import com.canhxuan.CanhXuan_Building.dto.response.ContractResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.*;
 import com.canhxuan.CanhXuan_Building.entity.*;
 import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
 import com.canhxuan.CanhXuan_Building.repository.CustomerRepository;
@@ -45,17 +44,7 @@ public class ContractServiceImpl implements ContractService {
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Get all contracts successfully");
         apiResponse.setData(contractRepository.findAll().stream().map(contract -> {
-            ContractResponse contractResponse = new ContractResponse();
-            contractResponse.setId(contract.getId());
-            contractResponse.setCustomer(contract.getCustomer());
-            contractResponse.setRoom(contract.getRoom());
-            contractResponse.setStartDate(contract.getStartDate());
-            contractResponse.setEndDate(contract.getEndDate());
-            contractResponse.setMonthlyRent(contract.getMonthlyRent());
-            contractResponse.setDepositAmount(contract.getDepositAmount());
-            contractResponse.setNote(contract.getNote());
-            contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
-            contractResponse.setService(contract.getServices());
+            ContractResponse contractResponse = toContractResponse(contract);
             return contractResponse;
         }).collect(Collectors.toList()));
         return apiResponse;
@@ -74,23 +63,13 @@ public class ContractServiceImpl implements ContractService {
         Page<Contract> contracts;
 
         if (currentUser.getRole().hasPermission(Permission.CONTRACT_MANAGE)) {
-            contracts = contractRepository.findAll(pageable);
+            contracts = contractRepository.loadAllWithGraph(pageable);
         } else {
             contracts = contractRepository.findByCreatedBy(currentUser, pageable);
         }
 
         Page<ContractResponse> responsePage = contracts.map(contract -> {
-            ContractResponse contractResponse = new ContractResponse();
-            contractResponse.setId(contract.getId());
-            contractResponse.setCustomer(contract.getCustomer());
-            contractResponse.setRoom(contract.getRoom());
-            contractResponse.setStartDate(contract.getStartDate());
-            contractResponse.setEndDate(contract.getEndDate());
-            contractResponse.setMonthlyRent(contract.getMonthlyRent());
-            contractResponse.setDepositAmount(contract.getDepositAmount());
-            contractResponse.setNote(contract.getNote());
-            contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
-            contractResponse.setService(contract.getServices());
+            ContractResponse contractResponse = toContractResponse(contract);
             return contractResponse;
         });
 
@@ -118,17 +97,7 @@ public class ContractServiceImpl implements ContractService {
         }
 
         Page<ContractResponse> responsePage = contracts.map(contract -> {
-            ContractResponse contractResponse = new ContractResponse();
-            contractResponse.setId(contract.getId());
-            contractResponse.setCustomer(contract.getCustomer());
-            contractResponse.setRoom(contract.getRoom());
-            contractResponse.setStartDate(contract.getStartDate());
-            contractResponse.setEndDate(contract.getEndDate());
-            contractResponse.setMonthlyRent(contract.getMonthlyRent());
-            contractResponse.setDepositAmount(contract.getDepositAmount());
-            contractResponse.setNote(contract.getNote());
-            contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
-            contractResponse.setService(contract.getServices());
+            ContractResponse contractResponse = toContractResponse(contract);
             return contractResponse;
         });
 
@@ -139,17 +108,19 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public ApiResponse<Contract> getById(Long id) {
-        ApiResponse<Contract> response = new ApiResponse<>();
+    public ApiResponse<ContractResponse> getById(Long id) {
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
+        ContractResponse contractResponse = toContractResponse(contract);
+        ApiResponse<ContractResponse> response = new ApiResponse<>();
         response.setMessage("Get contract successfully");
         response.setSuccess(true);
-        response.setData(contractRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id)));
+        response.setData(contractResponse);
         return response;
     }
 
     @Override
-    public ApiResponse<Contract> create(CreateContractDto dto) {
+    public ApiResponse<ContractResponse> create(CreateContractDto dto) {
         Room room = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + dto.getRoomId()));
         if (room.getStatus().equals(RoomStatus.OCCUPIED) || room.getStatus().equals(RoomStatus.MAINTENANCE)) {
@@ -176,17 +147,19 @@ public class ContractServiceImpl implements ContractService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         contract.setCreatedBy(userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found with username: " + username)));
-        ApiResponse<Contract> response = new ApiResponse<>();
+        contract = contractRepository.save(contract);
+        ContractResponse contractResponse = toContractResponse(contract);
+        ApiResponse<ContractResponse> response = new ApiResponse<>();
         response.setMessage("Create contract successfully");
         response.setSuccess(true);
-        response.setData(contractRepository.save(contract));
+        response.setData(contractResponse);
         room.setStatus(RoomStatus.OCCUPIED);
         roomRepository.save(room);
         return response;
     }
 
     @Override
-    public ApiResponse<Contract> update(Long id, Contract contract) {
+    public ApiResponse<ContractResponse> update(Long id, Contract contract) {
         Contract currentContract = contractRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
         Customer currentCustomer = customerRepository.findById(contract.getCustomer().getId())
@@ -207,10 +180,12 @@ public class ContractServiceImpl implements ContractService {
         currentContract.setPaymentDueDate(contract.getPaymentDueDate());
         currentContract.setServices(contract.getServices());
         currentContract.setCustomer(currentCustomer);
-        ApiResponse<Contract> response = new ApiResponse<>();
+        currentContract = contractRepository.save(currentContract);
+        ContractResponse contractResponse = toContractResponse(currentContract);
+        ApiResponse<ContractResponse> response = new ApiResponse<>();
         response.setMessage("Update contract successfully");
         response.setSuccess(true);
-        response.setData(contractRepository.save(currentContract));
+        response.setData(contractResponse);
         return response;
     }
 
@@ -223,5 +198,60 @@ public class ContractServiceImpl implements ContractService {
         response.setMessage("Delete contract successfully");
         response.setSuccess(true);
         return response;
+    }
+
+    private CustomerDTO toCustomerDTO(Customer customer) {
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setId(customer.getId());
+        customerDTO.setFullname(customer.getFullname());
+        customerDTO.setCccd(customer.getCccd());
+        customerDTO.setPhone(customer.getPhone());
+        customerDTO.setEmail(customer.getEmail());
+        customerDTO.setDateOfBirth(customer.getDateOfBirth());
+        customerDTO.setAddress(customer.getAddress());
+        customerDTO.setStatus(customer.getStatus());
+        customerDTO.setGender(customer.getGender());
+        return customerDTO;
+    }
+
+    private RoomDTO toRoomDTO(Room room) {
+        RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setId(room.getId());
+        roomDTO.setName(room.getName());
+        roomDTO.setFloor(room.getFloor());
+        roomDTO.setCapacity(room.getCapacity());
+        roomDTO.setPrice(room.getPrice());
+        roomDTO.setStatus(room.getStatus());
+        roomDTO.setDescription(room.getDescription());
+        return roomDTO;
+    }
+
+    private ServiceDTO toServiceDTO(com.canhxuan.CanhXuan_Building.entity.Service service) {
+        ServiceDTO serviceDTO = new ServiceDTO();
+        serviceDTO.setId(service.getId());
+        serviceDTO.setName(service.getName());
+        serviceDTO.setDescription(service.getDescription());
+        serviceDTO.setPrice(service.getPrice());
+        serviceDTO.setType(service.getType());
+        serviceDTO.setUnit(service.getUnit());
+        return serviceDTO;
+    }
+
+    private ContractResponse toContractResponse(Contract contract) {
+        ContractResponse contractResponse = new ContractResponse();
+        contractResponse.setId(contract.getId());
+        contractResponse.setStartDate(contract.getStartDate());
+        contractResponse.setEndDate(contract.getEndDate());
+        contractResponse.setDepositAmount(contract.getDepositAmount());
+        contractResponse.setMonthlyRent(contract.getMonthlyRent());
+        contractResponse.setPaymentDueDate(contract.getPaymentDueDate());
+        contractResponse.setNote(contract.getNote());
+        contractResponse.setCustomer(toCustomerDTO(contract.getCustomer()));
+        contractResponse.setRoom(toRoomDTO(contract.getRoom()));
+        List<ServiceDTO> serviceDTOs = contract.getServices().stream()
+                .map(this::toServiceDTO)
+                .collect(Collectors.toList());
+        contractResponse.setService(serviceDTOs);
+        return contractResponse;
     }
 }

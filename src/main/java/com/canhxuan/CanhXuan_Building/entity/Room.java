@@ -18,6 +18,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NamedEntityGraph(
+        name = "Room.full",
+        attributeNodes = {
+                @NamedAttributeNode("images"),
+                @NamedAttributeNode("building")
+        })
 public class Room {
 
     @Id
@@ -46,16 +52,15 @@ public class Room {
     @Size(max = 500, message = "Description must not exceed 500 characters")
     String description;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     List<RoomImage> images = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "building_id", nullable = false)
     @JsonIgnoreProperties("roomList")
     Building building;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     List<Contract> contracts = new ArrayList<>();
 }

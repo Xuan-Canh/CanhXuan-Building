@@ -22,6 +22,5 @@ public class RoomImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
-    @JsonBackReference
     Room room;
 }

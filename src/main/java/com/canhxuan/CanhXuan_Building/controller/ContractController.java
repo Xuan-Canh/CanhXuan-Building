@@ -59,7 +59,7 @@ public class ContractController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or (hasAuthority('CONTRACT_READ_OWN') and @authHelper.isContractOwner(#id))")
-    public ResponseEntity<ApiResponse<Contract>> getById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ContractResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contractService.getById(id));
     }
 
@@ -97,13 +97,13 @@ public class ContractController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Contract>> create(@RequestBody CreateContractDto dto) {
+    public ResponseEntity<ApiResponse<ContractResponse>> create(@RequestBody CreateContractDto dto) {
         return ResponseEntity.ok(contractService.create(dto));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or " + "(hasAuthority('CONTRACT_UPDATE_OWN') and @authHelper.isContractOwner(#id))")
-    public ResponseEntity<ApiResponse<Contract>> update(@PathVariable Long id, @RequestBody Contract contract) {
+    public ResponseEntity<ApiResponse<ContractResponse>> update(@PathVariable Long id, @RequestBody Contract contract) {
         return ResponseEntity.ok(contractService.update(id, contract));
     }
 

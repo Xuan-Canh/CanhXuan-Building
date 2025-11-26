@@ -32,6 +32,10 @@ import java.util.List;
                 }
         )
 )
+@NamedEntityGraph(
+        name = "Building.images",
+        attributeNodes = @NamedAttributeNode("images")
+)
 public class Building {
 
     @Id
@@ -58,8 +62,7 @@ public class Building {
     @Min(value = 1, message = "Number of rooms must be at least 1")
     Integer rooms;
 
-    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     List<BuildingImage> images = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)

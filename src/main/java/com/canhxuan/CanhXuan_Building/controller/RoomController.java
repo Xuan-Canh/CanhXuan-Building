@@ -65,13 +65,11 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}/images")
-    @PreAuthorize("hasAuthority('ROOM_MANAGE') or hasAuthority('ROOM_READ')")
     public ResponseEntity<ApiResponse<List<RoomImage>>> findImagesByRoomId(@PathVariable Long roomId) {
         return ResponseEntity.ok(roomService.findImagesByRoomId(roomId));
     }
 
     @GetMapping("/{roomId}/images/{fileName:.+}")
-    @PreAuthorize("hasAuthority('ROOM_MANAGE') or hasAuthority('ROOM_READ')")
     public ResponseEntity<Resource> serveImage(@PathVariable Long roomId, @PathVariable String fileName) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         Resource resource = new UrlResource(filePath.toUri());
