@@ -55,12 +55,10 @@ public class GlobalExceptionHandler {
                     .build());
         }
 
-        // 2. Database constraint violation (unique, foreign key, etc.)
         if (rootCause instanceof DataIntegrityViolationException) {
             return handleDataIntegrityViolation((DataIntegrityViolationException) rootCause);
         }
 
-        // 3. SQL Exception
         if (rootCause instanceof SQLException) {
             SQLException sqlEx = (SQLException) rootCause;
             String message = parseSQLException(sqlEx);
@@ -71,7 +69,6 @@ public class GlobalExceptionHandler {
                     .build());
         }
 
-        // 4. Generic error
         String errorMessage = rootCause != null
                 ? rootCause.getMessage()
                 : ex.getMessage();
@@ -130,14 +127,14 @@ public class GlobalExceptionHandler {
                 .build());
     }
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ApiResponse<Void>> handleResponseStatusException(ResponseStatusException ex) {
-        ApiResponse<Void> response = new ApiResponse<>();
-        response.setSuccess(false);
-        response.setMessage(ex.getReason());
-        response.setData(null);
-        return ResponseEntity.status(ex.getStatusCode()).body(response);
-    }
+//    @ExceptionHandler(ResponseStatusException.class)
+//    public ResponseEntity<ApiResponse<Void>> handleResponseStatusException(ResponseStatusException ex) {
+//        ApiResponse<Void> response = new ApiResponse<>();
+//        response.setSuccess(false);
+//        response.setMessage(ex.getReason());
+//        response.setData(null);
+//        return ResponseEntity.status(ex.getStatusCode()).body(response);
+//    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {

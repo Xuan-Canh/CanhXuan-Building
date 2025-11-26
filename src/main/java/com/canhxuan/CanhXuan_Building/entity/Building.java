@@ -1,5 +1,6 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
+import com.canhxuan.CanhXuan_Building.dto.response.DashboardDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -15,6 +16,22 @@ import java.util.List;
 @Table(name = "buildings")
 @Getter
 @Setter
+@SqlResultSetMapping(
+        name = "DashboardMapping",
+        classes = @ConstructorResult(
+                targetClass = DashboardDto.class,
+                columns = {
+                        @ColumnResult(name = "totalBuildings", type = Long.class),
+                        @ColumnResult(name = "totalRooms", type = Long.class),
+                        @ColumnResult(name = "emptyRooms", type = Long.class),
+                        @ColumnResult(name = "rentedRooms", type = Long.class),
+                        @ColumnResult(name = "totalCustomers", type = Long.class),
+                        @ColumnResult(name = "activeContracts", type = Long.class),
+                        @ColumnResult(name = "monthlyRevenue", type = Double.class),
+                        @ColumnResult(name = "unpaidInvoices", type = Long.class)
+                }
+        )
+)
 public class Building {
 
     @Id
@@ -45,7 +62,7 @@ public class Building {
     @JsonManagedReference
     List<BuildingImage> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("building")
     List<Room> roomList = new ArrayList<>();
 

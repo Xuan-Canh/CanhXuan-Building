@@ -1,6 +1,7 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -53,6 +54,7 @@ public class Invoice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
+    @JsonIgnore
     User createdBy;
 
     LocalDateTime createdAt;

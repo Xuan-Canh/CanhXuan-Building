@@ -1,6 +1,8 @@
 package com.canhxuan.CanhXuan_Building.controller;
 
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.BuildingResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.ImageDto;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
 import com.canhxuan.CanhXuan_Building.service.BuildingService;
@@ -35,31 +37,29 @@ public class BuildingController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
-    public ResponseEntity<ApiResponse<Page<Building>>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "9") int size) {
+    public ResponseEntity<ApiResponse<Page<BuildingResponse>>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "9") int size) {
         return ResponseEntity.ok(buildingService.getAll(page, size));
     }
 
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
-    public ResponseEntity<ApiResponse<Page<Building>>> getByName(@RequestParam(defaultValue = "") String keyword,
+    public ResponseEntity<ApiResponse<Page<BuildingResponse>>> getByName(@RequestParam(defaultValue = "") String keyword,
                                                                  @RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(buildingService.searchByNameOrAddress(keyword, page));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
-    public ResponseEntity<ApiResponse<Building>> getById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<BuildingResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(buildingService.getById(id));
     }
 
     @GetMapping("/{buildingId}/images")
-    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
-    public ResponseEntity<ApiResponse<List<BuildingImage>>> findByBuildingId(@PathVariable Long buildingId) {
+    public ResponseEntity<ApiResponse<List<ImageDto>>> findByBuildingId(@PathVariable Long buildingId) {
         return ResponseEntity.ok(buildingService.findByBuildingId(buildingId));
     }
 
     @GetMapping("{buildingId}/images/{fileName:.+}")
-    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         Resource resource = new UrlResource(filePath.toUri());
@@ -78,13 +78,13 @@ public class BuildingController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
-    public ResponseEntity<ApiResponse<Building>> create(@RequestBody Building building) {
+    public ResponseEntity<ApiResponse<BuildingResponse>> create(@RequestBody Building building) {
         return ResponseEntity.ok(buildingService.create(building));
     }
 
     @PostMapping("/{buildingId}/images")
     @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
-    public ResponseEntity<ApiResponse<BuildingImage>> addImageToBuilding(@PathVariable Long buildingId,
+    public ResponseEntity<ApiResponse<ImageDto>> addImageToBuilding(@PathVariable Long buildingId,
                                                                          @RequestParam("file") MultipartFile image) throws IOException {
         try {
             return ResponseEntity.ok(buildingService.saveImage(buildingId, image));
@@ -96,7 +96,7 @@ public class BuildingController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
-    public ResponseEntity<ApiResponse<Building>> update(@PathVariable Long id, @RequestBody Building building) {
+    public ResponseEntity<ApiResponse<BuildingResponse>> update(@PathVariable Long id, @RequestBody Building building) {
         return ResponseEntity.ok(buildingService.update(id, building));
     }
 

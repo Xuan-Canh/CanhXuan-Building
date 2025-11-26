@@ -3,6 +3,7 @@ package com.canhxuan.CanhXuan_Building.dto.response;
 import com.canhxuan.CanhXuan_Building.entity.Contract;
 import com.canhxuan.CanhXuan_Building.entity.InvoiceServiceDetail;
 import com.canhxuan.CanhXuan_Building.entity.InvoiceStatus;
+import com.canhxuan.CanhXuan_Building.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,6 @@ public class InvoiceResponse {
     InvoiceStatus status;
     String note;
     LocalDateTime paidAt;
+    User createdBy;
     List<InvoiceServiceDetail> serviceDetail;
 }

@@ -40,32 +40,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
-                        // Public endpoints
                         .requestMatchers("/canhxuan/auth/**").permitAll()
                         .requestMatchers("/canhxuan/buildings/*/images/**",
                                 "/canhxuan/rooms/*/images/**",
                                 "/canhxuan/users/profile/*/image/**",
                                 "/canhxuan/users/profile/**").permitAll()
-
-//                        // USER and ADMIN endpoints
-//                        .requestMatchers(
-//                                "/canhxuan/buildings/**",
-//                                "/canhxuan/rooms/**",
-//                                "/canhxuan/contracts/**",
-//                                "/canhxuan/services",
-//                                "/canhxuan/invoices/**",
-//                                "/canhxuan/invoices/*/**"
-//                        ).hasAnyAuthority("USER", "ADMIN")
-//
-//                        // ADMIN only endpoints
-//                        .requestMatchers(
-//                                "/canhxuan/customers/**",
-//                                "/canhxuan/services/**",
-//                                "/canhxuan/users/**",
-//                                "/canhxuan/dashboard/**"
-//                        ).hasAuthority("ADMIN")
-
-                        // Authenticated endpoints
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

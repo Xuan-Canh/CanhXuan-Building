@@ -52,5 +52,6 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+
     java.util.List<Contract> contracts;
 }

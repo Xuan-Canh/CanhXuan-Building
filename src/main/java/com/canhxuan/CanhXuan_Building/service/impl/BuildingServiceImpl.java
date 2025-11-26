@@ -1,6 +1,8 @@
 package com.canhxuan.CanhXuan_Building.service.impl;
 
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.BuildingResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.ImageDto;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
 import com.canhxuan.CanhXuan_Building.repository.BuildingImageRepository;
@@ -31,55 +33,146 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public ApiResponse<Page<Building>> getAll(int page, int size) {
+    public ApiResponse<Page<BuildingResponse>> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
+        Page<Building> buildings = buildingRepository.findAll(pageable);
+        Page<BuildingResponse> buildingResponses = buildings.map(building -> {
+                    BuildingResponse response = new BuildingResponse();
+                    response.setId(building.getId());
+                    response.setName(building.getName());
+                    response.setAddress(building.getAddress());
+                    response.setDescription(building.getDescription());
+                    response.setFloors(building.getFloors());
+                    response.setRooms(building.getRooms());
+                    response.setImages(building.getImages().stream().map(image -> {
+                        ImageDto img = new ImageDto();
+                        img.setId(image.getId());
+                        img.setFileName(image.getFileName());
+                        img.setFilePath(image.getFilePath());
+                        img.setFileType(image.getFileType());
+                        return img;
+                    }).toList()
+                    );
+                    return response;
+                });
+        ApiResponse<Page<BuildingResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Get all buildings successfully");
-        apiResponse.setData(buildingRepository.findAll(pageable));
+        apiResponse.setData(buildingResponses);
         return apiResponse;
     }
 
     @Override
-    public ApiResponse<Page<Building>> searchByNameOrAddress(String keyword, Integer page) {
+    public ApiResponse<Page<BuildingResponse>> searchByNameOrAddress(String keyword, Integer page) {
         Pageable pageable = PageRequest.of(page, 9);
-        ApiResponse<Page<Building>> apiResponse = new ApiResponse<>();
+        Page<Building> buildingPages = buildingRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword, pageable);
+        Page<BuildingResponse> buildingResponses = buildingPages.map(building -> {
+            BuildingResponse response = new BuildingResponse();
+            response.setId(building.getId());
+            response.setName(building.getName());
+            response.setAddress(building.getAddress());
+            response.setDescription(building.getDescription());
+            response.setFloors(building.getFloors());
+            response.setRooms(building.getRooms());
+            response.setImages(building.getImages().stream().map(image -> {
+                ImageDto img = new ImageDto();
+                img.setId(image.getId());
+                img.setFileName(image.getFileName());
+                img.setFilePath(image.getFilePath());
+                img.setFileType(image.getFileType());
+                return img;
+            }).toList()
+            );
+            return response;
+        });
+        ApiResponse<Page<BuildingResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Get buildings by name successfully");
-        apiResponse.setData(buildingRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword, pageable));
+        apiResponse.setData(buildingResponses);
         return apiResponse;
     }
 
     @Override
-    public ApiResponse<Building> getById(Long id) {
-        ApiResponse<Building> apiResponse = new ApiResponse<>();
+    public ApiResponse<BuildingResponse> getById(Long id) {
+        Building building = buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id));
+        BuildingResponse buildingResponse = new BuildingResponse();
+        buildingResponse.setId(building.getId());
+        buildingResponse.setName(building.getName());
+        buildingResponse.setAddress(building.getAddress());
+        buildingResponse.setDescription(building.getDescription());
+        buildingResponse.setFloors(building.getFloors());
+        buildingResponse.setRooms(building.getRooms());
+        buildingResponse.setImages(building.getImages().stream().map(image -> {
+            ImageDto img = new ImageDto();
+            img.setId(image.getId());
+            img.setFileName(image.getFileName());
+            img.setFilePath(image.getFilePath());
+            img.setFileType(image.getFileType());
+            return img;
+        }).toList()
+        );
+        ApiResponse<BuildingResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Get building by id successfully");
-        apiResponse.setData(buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id)));
+        apiResponse.setData(buildingResponse);
         return apiResponse;
     }
 
     @Override
-    public ApiResponse<Building> create(Building building) {
-        ApiResponse<Building> apiResponse = new ApiResponse<>();
+    public ApiResponse<BuildingResponse> create(Building building) {
+        Building created = buildingRepository.save(building);
+        BuildingResponse buildingResponse = new BuildingResponse();
+        buildingResponse.setId(created.getId());
+        buildingResponse.setName(created.getName());
+        buildingResponse.setAddress(created.getAddress());
+        buildingResponse.setDescription(created.getDescription());
+        buildingResponse.setFloors(created.getFloors());
+        buildingResponse.setRooms(created.getRooms());
+        buildingResponse.setImages(created.getImages().stream().map(image -> {
+            ImageDto img = new ImageDto();
+            img.setId(image.getId());
+            img.setFileName(image.getFileName());
+            img.setFilePath(image.getFilePath());
+            img.setFileType(image.getFileType());
+            return img;
+        }).toList()
+        );
+        ApiResponse<BuildingResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Create building successfully");
-        apiResponse.setData(buildingRepository.save(building));
+        apiResponse.setData(buildingResponse);
         return apiResponse;
     }
 
     @Override
-    public ApiResponse<Building> update(Long id, Building building) {
+    public ApiResponse<BuildingResponse> update(Long id, Building building) {
         Building presentBuilding = buildingRepository.findById(id).orElseThrow(() -> new RuntimeException("Building not found with id: " + id));
         presentBuilding.setName(building.getName());
         presentBuilding.setAddress(building.getAddress());
         presentBuilding.setDescription(building.getDescription());
         presentBuilding.setRooms(building.getRooms());
         presentBuilding.setFloors(building.getFloors());
-        ApiResponse<Building> apiResponse = new ApiResponse<>();
+        buildingRepository.save(presentBuilding);
+        BuildingResponse buildingResponse = new BuildingResponse();
+        buildingResponse.setId(presentBuilding.getId());
+        buildingResponse.setName(presentBuilding.getName());
+        buildingResponse.setAddress(presentBuilding.getAddress());
+        buildingResponse.setDescription(presentBuilding.getDescription());
+        buildingResponse.setFloors(presentBuilding.getFloors());
+        buildingResponse.setRooms(presentBuilding.getRooms());
+        buildingResponse.setImages(presentBuilding.getImages().stream().map(image -> {
+            ImageDto img = new ImageDto();
+            img.setId(image.getId());
+            img.setFileName(image.getFileName());
+            img.setFilePath(image.getFilePath());
+            img.setFileType(image.getFileType());
+            return img;
+        }).toList()
+        );
+        ApiResponse<BuildingResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Update building successfully");
-        apiResponse.setData(buildingRepository.save(presentBuilding));
+        apiResponse.setData(buildingResponse);
         return apiResponse;
     }
 
@@ -94,7 +187,7 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public ApiResponse<BuildingImage> saveImage(Long buildingId, MultipartFile file) throws IOException {
+    public ApiResponse<ImageDto> saveImage(Long buildingId, MultipartFile file) throws IOException {
         Building building = buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new RuntimeException("Building not found with id: " + buildingId));
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
@@ -111,19 +204,35 @@ public class BuildingServiceImpl implements BuildingService {
         buildingImage.setFileName(fileName);
         buildingImage.setFilePath(filePath.toString());
         buildingImage.setFileType(file.getContentType());
-        ApiResponse<BuildingImage> response = new ApiResponse<>();
+        buildingImageRepository.save(buildingImage);
+        ImageDto imageDto = new ImageDto();
+        imageDto.setId(buildingImage.getId());
+        imageDto.setFileName(buildingImage.getFileName());
+        imageDto.setFilePath(buildingImage.getFilePath());
+        imageDto.setFileType(buildingImage.getFileType());
+        ApiResponse<ImageDto> response = new ApiResponse<>();
         response.setSuccess(true);
         response.setMessage("Save image successfully");
-        response.setData(buildingImageRepository.save(buildingImage));
+        response.setData(imageDto);
         return response;
     }
 
     @Override
-    public ApiResponse<List<BuildingImage>> findByBuildingId(Long buildingId) {
+    public ApiResponse<List<ImageDto>> findByBuildingId(Long buildingId) {
+        List<ImageDto> imageDtos = buildingImageRepository.findByBuildingId(buildingId).stream().map(
+                image -> {
+                    ImageDto img = new ImageDto();
+                    img.setId(image.getId());
+                    img.setFileName(image.getFileName());
+                    img.setFilePath(image.getFilePath());
+                    img.setFileType(image.getFileType());
+                    return img;
+                }
+        ).toList();
         ApiResponse response = new ApiResponse<>();
         response.setSuccess(true);
         response.setMessage("Get images successfully");
-        response.setData(buildingImageRepository.findByBuildingId(buildingId));
+        response.setData(imageDtos);
         return response;
     }
 
