@@ -6,17 +6,16 @@ import com.canhxuan.CanhXuan_Building.dto.request.ServiceUsageDetail;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.InvoiceResponse;
 import com.canhxuan.CanhXuan_Building.entity.*;
-import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
-import com.canhxuan.CanhXuan_Building.repository.InvoiceRepository;
-import com.canhxuan.CanhXuan_Building.repository.InvoiceServiceDetailRepository;
-import com.canhxuan.CanhXuan_Building.repository.ServiceRepository;
+import com.canhxuan.CanhXuan_Building.repository.*;
 import com.canhxuan.CanhXuan_Building.service.InvoiceService;
+import com.canhxuan.CanhXuan_Building.utils.AuthHelper;
 import com.canhxuan.CanhXuan_Building.utils.kafka.Producer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,21 +31,35 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceServiceDetailRepository invoiceServiceDetailRepository;
     private final ServiceRepository serviceRepository;
     private final Producer producer;
+    private final UserRepository userRepository;
+    private final AuthHelper authHelper;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository, InvoiceServiceDetailRepository invoiceServiceDetailRepository, ServiceRepository serviceRepository, Producer producer) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository, InvoiceServiceDetailRepository invoiceServiceDetailRepository, ServiceRepository serviceRepository, Producer producer, UserRepository userRepository, AuthHelper authHelper) {
         this.invoiceRepository = invoiceRepository;
         this.contractRepository = contractRepository;
         this.invoiceServiceDetailRepository = invoiceServiceDetailRepository;
         this.serviceRepository = serviceRepository;
         this.producer = producer;
+        this.userRepository = userRepository;
+        this.authHelper = authHelper;
     }
 
     @Override
     public ApiResponse<Page<InvoiceResponse>> getAll(Integer page) {
+        authHelper.requirePermission(Permission.INVOICE_MANAGE, Permission.INVOICE_READ_OWN);
+        User user = authHelper.getCurrentUser();
+
         Pageable pageable = PageRequest.of(Math.max(0, page), 10);
         ApiResponse<Page<InvoiceResponse>> apiResponse = new ApiResponse<>();
 
-        Page<Invoice> invoices = invoiceRepository.findAll(pageable);
+        Page<Invoice> invoices;
+
+        if (user.getRole().hasPermission(Permission.INVOICE_MANAGE)) {
+             invoices = invoiceRepository.findAll(pageable);
+        } else {
+            invoices = invoiceRepository.findByCreatedBy(user, pageable);
+        }
+
         Page<InvoiceResponse> responsePage = invoices.map(invoice -> {
             InvoiceResponse response = new InvoiceResponse();
             response.setId(invoice.getId());
@@ -136,6 +149,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setTotalAmount(invoice.getRoomRent() + invoice.getTotalServiceFee());
         invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setNote(createInvoiceRequest.getNote());
+        User createdBy = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+        invoice.setCreatedBy(createdBy);
         Invoice saved = invoiceRepository.save(invoice);
         String to = saved.getContract().getCustomer().getEmail();
         String subject = "New Invoice";

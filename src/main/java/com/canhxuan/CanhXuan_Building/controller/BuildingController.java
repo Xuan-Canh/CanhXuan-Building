@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,27 +34,32 @@ public class BuildingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<ApiResponse<Page<Building>>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "9") int size) {
         return ResponseEntity.ok(buildingService.getAll(page, size));
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<ApiResponse<Page<Building>>> getByName(@RequestParam(defaultValue = "") String keyword,
                                                                  @RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(buildingService.searchByNameOrAddress(keyword, page));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<ApiResponse<Building>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(buildingService.getById(id));
     }
 
     @GetMapping("/{buildingId}/images")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<ApiResponse<List<BuildingImage>>> findByBuildingId(@PathVariable Long buildingId) {
         return ResponseEntity.ok(buildingService.findByBuildingId(buildingId));
     }
 
     @GetMapping("{buildingId}/images/{fileName:.+}")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
         Resource resource = new UrlResource(filePath.toUri());
@@ -71,11 +77,13 @@ public class BuildingController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
     public ResponseEntity<ApiResponse<Building>> create(@RequestBody Building building) {
         return ResponseEntity.ok(buildingService.create(building));
     }
 
     @PostMapping("/{buildingId}/images")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
     public ResponseEntity<ApiResponse<BuildingImage>> addImageToBuilding(@PathVariable Long buildingId,
                                                                          @RequestParam("file") MultipartFile image) throws IOException {
         try {
@@ -87,16 +95,19 @@ public class BuildingController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
     public ResponseEntity<ApiResponse<Building>> update(@PathVariable Long id, @RequestBody Building building) {
         return ResponseEntity.ok(buildingService.update(id, building));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         return ResponseEntity.ok(buildingService.delete(id));
     }
 
     @DeleteMapping("/{buildingId}/images/{imageId}")
+    @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> deleteBuildingImage(@PathVariable Long imageId) {
         return ResponseEntity.ok(buildingService.deleteImage(imageId));
     }

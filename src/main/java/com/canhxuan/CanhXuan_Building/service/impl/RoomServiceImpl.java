@@ -5,6 +5,7 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.Room;
 import com.canhxuan.CanhXuan_Building.entity.RoomImage;
+import com.canhxuan.CanhXuan_Building.entity.RoomStatus;
 import com.canhxuan.CanhXuan_Building.repository.BuildingRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomImageRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
@@ -72,6 +73,15 @@ public class RoomServiceImpl implements RoomService {
         response.setMessage("Get room by id successfully");
         response.setData(roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + id)));
+        return response;
+    }
+
+    @Override
+    public ApiResponse<List<Room>> getAvailableRooms() {
+        ApiResponse<List<Room>> response = new ApiResponse<>();
+        response.setData(roomRepository.findByStatus(RoomStatus.AVAILABLE));
+        response.setSuccess(true);
+        response.setMessage("Get available rooms successfully");
         return response;
     }
 

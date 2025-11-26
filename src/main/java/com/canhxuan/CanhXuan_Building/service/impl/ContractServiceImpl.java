@@ -10,7 +10,9 @@ import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
 import com.canhxuan.CanhXuan_Building.repository.UserRepository;
 import com.canhxuan.CanhXuan_Building.service.ContractService;
 import com.canhxuan.CanhXuan_Building.utils.AuthHelper;
+import com.canhxuan.CanhXuan_Building.utils.JwtUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,13 +25,17 @@ public class ContractServiceImpl implements ContractService {
     private final ContractRepository contractRepository;
     private final CustomerRepository customerRepository;
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
     private final AuthHelper authHelper;
+    private final JwtUtil jwtUtil;
 
-    public ContractServiceImpl(ContractRepository contractRepository, UserRepository userRepository, CustomerRepository customerRepository, RoomRepository roomRepository, AuthHelper authHelper) {
+    public ContractServiceImpl(ContractRepository contractRepository, UserRepository userRepository, CustomerRepository customerRepository, RoomRepository roomRepository, UserRepository userRepository1, AuthHelper authHelper, JwtUtil jwtUtil) {
         this.contractRepository = contractRepository;
         this.customerRepository = customerRepository;
         this.roomRepository = roomRepository;
+        this.userRepository = userRepository1;
         this.authHelper = authHelper;
+        this.jwtUtil = jwtUtil;
     }
 
 
@@ -57,7 +63,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public ApiResponse<Page<ContractResponse>> getAll(Integer page) {
-        authHelper.requirePermission(Permission.CONTRACT_READ_ALL, Permission.CONTRACT_READ_OWN);
+        authHelper.requirePermission(Permission.CONTRACT_MANAGE, Permission.CONTRACT_READ_OWN);
 
         User currentUser = authHelper.getCurrentUser();
 
@@ -67,7 +73,7 @@ public class ContractServiceImpl implements ContractService {
 
         Page<Contract> contracts;
 
-        if (currentUser.getRole().hasPermission(Permission.CONTRACT_READ_ALL)) {
+        if (currentUser.getRole().hasPermission(Permission.CONTRACT_MANAGE)) {
             contracts = contractRepository.findAll(pageable);
         } else {
             contracts = contractRepository.findByCreatedBy(currentUser, pageable);
@@ -96,11 +102,21 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public ApiResponse<Page<ContractResponse>> searchByFullnameOrCccd(String keyword, Integer page) {
+        authHelper.requirePermission(Permission.CONTRACT_MANAGE, Permission.CONTRACT_READ_OWN);
+        User currentUser = authHelper.getCurrentUser();
+
         ApiResponse<Page<ContractResponse>> response = new ApiResponse<>();
         int p = page == null ? 0 : Math.max(0, page);
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(p, 10);
 
-        Page<Contract> contracts = contractRepository.findByCustomerFullnameContainingIgnoreCaseOrCustomerCccdContaining(keyword, keyword, pageable);
+        Page<Contract> contracts;
+
+        if (currentUser.getRole().hasPermission(Permission.CONTRACT_MANAGE)) {
+            contracts = contractRepository.findByCustomerFullnameContainingIgnoreCaseOrCustomerCccdContaining(keyword, keyword, pageable);
+        } else {
+            contracts = contractRepository.findByCreatedByAndKeyword(currentUser, keyword, pageable);
+        }
+
         Page<ContractResponse> responsePage = contracts.map(contract -> {
             ContractResponse contractResponse = new ContractResponse();
             contractResponse.setId(contract.getId());
@@ -157,6 +173,9 @@ public class ContractServiceImpl implements ContractService {
         contract.setPaymentDueDate(dto.getPaymentDueDate());
         contract.setServices(dto.getServices());
         contract.setStatus(ContractStatus.ACTIVE);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        contract.setCreatedBy(userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found with username: " + username)));
         ApiResponse<Contract> response = new ApiResponse<>();
         response.setMessage("Create contract successfully");
         response.setSuccess(true);

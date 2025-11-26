@@ -51,6 +51,10 @@ public class Invoice {
 
     String note;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
+    User createdBy;
+
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 

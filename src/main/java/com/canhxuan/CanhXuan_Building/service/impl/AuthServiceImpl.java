@@ -5,6 +5,7 @@ import com.canhxuan.CanhXuan_Building.dto.request.MailDto;
 import com.canhxuan.CanhXuan_Building.dto.request.RegisterRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.LoginResponse;
+import com.canhxuan.CanhXuan_Building.entity.Role;
 import com.canhxuan.CanhXuan_Building.entity.User;
 import com.canhxuan.CanhXuan_Building.repository.UserRepository;
 import com.canhxuan.CanhXuan_Building.service.AuthService;
@@ -77,15 +78,13 @@ public class AuthServiceImpl implements AuthService {
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             String accessToken = jwtUtil.generateAccessToken(authentication);
             String refreshToken = jwtUtil.generateRefreshToken(authentication);
-            String roles = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(","));
+            User user = userRepository.findByUsername(request.getUsername()).get();
+            Role role = user.getRole();
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setRole(roles);
+            loginResponse.setRole(role);
             loginResponse.setUsername(request.getUsername().toLowerCase());
             loginResponse.setAccessToken(accessToken);
             loginResponse.setRefreshToken(refreshToken);
-            User user = userRepository.findByUsername(request.getUsername()).get();
             loginResponse.setUserAvatar(user.getAvatarUrl());
             response.setSuccess(true);
             response.setMessage("Login successfully, welcome " + request.getUsername());

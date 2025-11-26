@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -29,11 +30,13 @@ public class InvoiceController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE') or hasAuthority('INVOICE_READ_OWN')")
     public ResponseEntity<ApiResponse<Page<InvoiceResponse>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(invoiceService.getAll(page));
     }
 
     @GetMapping("/export")
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE')")
     public ResponseEntity<byte[]> exportInvoicesToExcel() throws Exception {
         byte[] data = jasperService.exportInvoicesToExcel();
         String filename = "Danh_sach_hoa_don_" +
@@ -46,6 +49,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE') or (hasAuthority('INVOICE_READ_OWN') and @authHelper.isInvoiceOwner(#id))")
     public ResponseEntity<ApiResponse<InvoiceResponse>> getById(@PathVariable String id) {
         return ResponseEntity.ok(invoiceService.getById(Long.parseLong(id)));
     }
@@ -57,6 +61,7 @@ public class InvoiceController {
     }
 
     @PatchMapping("/{id}/pay")
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE') or (hasAuthority('INVOICE_READ_OWN') and @authHelper.isInvoiceOwner(#id))")
     public ResponseEntity<ApiResponse<InvoiceResponse>> markAsPaid(@PathVariable Long id) {
         return ResponseEntity.ok(invoiceService.markAsPaid(id));
     }

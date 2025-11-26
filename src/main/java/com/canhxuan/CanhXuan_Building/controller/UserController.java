@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,12 +34,14 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<ApiResponse<Page<User>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(userService.findAll(page));
     }
 
     @GetMapping("/profile/{username}")
-    public ResponseEntity<ApiResponse<User>> getByUsername(@PathVariable String username) {
+    @PreAuthorize("hasAuthority('USER_MANAGE') or (hasAuthority('USER_PROFILE_OWN') and @authHelper.isUserProfileOwner(#username))")
+    public ResponseEntity<ApiResponse<User>> getByUsername(@PathVariable("username") String username) {
         return ResponseEntity.ok(userService.getByUsername(username));
     }
 
@@ -60,21 +63,25 @@ public class UserController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<ApiResponse<User>> create(@RequestBody User user) {
         return ResponseEntity.ok(userService.create(user));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<ApiResponse<User>> update(@PathVariable Long id, @RequestBody User user ){
         return ResponseEntity.ok(userService.update(id, user));
     }
 
     @PutMapping("/profile/{username}")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or (hasAuthority('USER_PROFILE_OWN') and @authHelper.isUserProfileOwner(#username))")
     public ResponseEntity<ApiResponse<User>> update(@PathVariable String username, @RequestBody EditProfileDto dto ){
         return ResponseEntity.ok(userService.editProfile(username, dto));
     }
 
     @PostMapping("/profile/{username}/avatar")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or (hasAuthority('USER_PROFILE_OWN') and @authHelper.isUserProfileOwner(#username))")
     public ResponseEntity<ApiResponse<User>> changeAvatar(@PathVariable String username,
                                                           @RequestParam("avatar") MultipartFile avatar) throws IOException {
         try {
@@ -86,6 +93,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.ok(userService.delete(id));

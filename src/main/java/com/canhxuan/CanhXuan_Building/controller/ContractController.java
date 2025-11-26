@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class ContractController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or hasAuthority('CONTRACT_READ_OWN')")
     public ResponseEntity<ApiResponse<Page<ContractResponse>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(contractService.getAll(page));
     }
@@ -37,11 +39,13 @@ public class ContractController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or hasAuthority('CONTRACT_READ_OWN')")
     public ResponseEntity<ApiResponse<Page<ContractResponse>>> searchByName(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(contractService.searchByFullnameOrCccd(keyword, page));
     }
 
     @GetMapping("/export")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE')")
     public ResponseEntity<byte[]> exportContractsToExcel() throws Exception {
         byte[] data = jasperService.exportContractsToExcel();
         String filename = "Danh_sach_hop_dong_" +
@@ -54,11 +58,13 @@ public class ContractController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or (hasAuthority('CONTRACT_READ_OWN') and @authHelper.isContractOwner(#id))")
     public ResponseEntity<ApiResponse<Contract>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contractService.getById(id));
     }
 
     @GetMapping("/{id}/export")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or (hasAuthority('CONTRACT_READ_OWN') and @authHelper.isContractOwner(#id))")
     public ResponseEntity<byte[]> exportContract(@PathVariable Long id) {
         try {
             byte[] pdfBytes = jasperService.exportContract(id);
@@ -77,6 +83,7 @@ public class ContractController {
     }
 
     @PostMapping("/{id}/send-email")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or (hasAuthority('CONTRACT_READ_OWN') and @authHelper.isContractOwner(#id))")
     public ResponseEntity<ApiResponse<String>> sendContractEmail(@PathVariable Long id) {
         try {
             jasperService.exportAndSendContract(id);
@@ -95,11 +102,13 @@ public class ContractController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or " + "(hasAuthority('CONTRACT_UPDATE_OWN') and @authHelper.isContractOwner(#id))")
     public ResponseEntity<ApiResponse<Contract>> update(@PathVariable Long id, @RequestBody Contract contract) {
         return ResponseEntity.ok(contractService.update(id, contract));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('CONTRACT_MANAGE') or " + "(hasAuthority('CONTRACT_DELETE_OWN') and @authHelper.isContractOwner(#id))")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         return ResponseEntity.ok(contractService.delete(id));
     }

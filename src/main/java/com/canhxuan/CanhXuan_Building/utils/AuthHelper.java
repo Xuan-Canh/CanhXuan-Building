@@ -2,6 +2,8 @@ package com.canhxuan.CanhXuan_Building.utils;
 
 import com.canhxuan.CanhXuan_Building.entity.Permission;
 import com.canhxuan.CanhXuan_Building.entity.User;
+import com.canhxuan.CanhXuan_Building.repository.ContractRepository;
+import com.canhxuan.CanhXuan_Building.repository.InvoiceRepository;
 import com.canhxuan.CanhXuan_Building.repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -12,9 +14,13 @@ import org.springframework.stereotype.Component;
 public class AuthHelper {
 
     private final UserRepository userRepository;
+    private final ContractRepository contractRepository;
+    private final InvoiceRepository invoiceRepository;
 
-    public AuthHelper(UserRepository userRepository) {
+    public AuthHelper(UserRepository userRepository, ContractRepository contractRepository, InvoiceRepository invoiceRepository) {
         this.userRepository = userRepository;
+        this.contractRepository = contractRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     public User getCurrentUser() {
@@ -42,8 +48,22 @@ public class AuthHelper {
         throw new AccessDeniedException("You don't have permission to perform this action");
     }
 
-    public boolean isOwner(Long userId) {
+    public boolean isContractOwner(Long contractId) {
         User currentUser = getCurrentUser();
-        return currentUser.getId().equals(userId);
+        boolean isOwner = contractRepository.existsByIdAndCreatedByUsername(contractId, currentUser.getUsername());
+        System.out.println("contractId: " + contractId + ", currentUser: " + currentUser.getUsername() + ", isOwner: " + isOwner);
+        return isOwner;
+    }
+
+    public boolean isInvoiceOwner(Long invoiceId) {
+        User currentUser = getCurrentUser();
+        boolean isOwner = invoiceRepository.existsByIdAndCreatedByUsername(invoiceId, currentUser.getUsername());
+        System.out.println("invoiceId: " + invoiceId + ", currentUser: " + currentUser.getUsername() + ", isOwner: " + isOwner);
+        return isOwner;
+    }
+
+    public boolean isUserProfileOwner(String username) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        return currentUsername.equals(username);
     }
 }

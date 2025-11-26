@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class CustomerController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CUSTOMER_MANAGE')")
     public ResponseEntity<ApiResponse<Page<Customer>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(customerService.getAll(page));
     }
@@ -38,11 +40,13 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('CUSTOMER_MANAGE')")
     public ResponseEntity<ApiResponse<Customer>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.getById(id));
     }
 
     @GetMapping("/export")
+    @PreAuthorize("hasAuthority('CUSTOMER_MANAGE')")
     public ResponseEntity<byte[]> exportCustomersToExcel() throws Exception {
         byte[] data = jasperService.exportCustomersToExcel();
         String filename = "Danh_sach_khach_hang_" +
@@ -55,16 +59,19 @@ public class CustomerController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CUSTOMER_MANAGE')")
     public ResponseEntity<ApiResponse<Customer>> create(@RequestBody Customer customer) {
         return ResponseEntity.ok(customerService.create(customer));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CUSTOMER_MANAGE')")
     public ResponseEntity<ApiResponse<Customer>> update(@PathVariable Long id, @RequestBody Customer customer) {
         return ResponseEntity.ok(customerService.update(id, customer));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('CUSTOMER_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.delete(id));
     }

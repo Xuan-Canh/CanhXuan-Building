@@ -15,6 +15,7 @@ public interface RoomService {
     ApiResponse<Page<Room>> searchByBuildingNameOrBuildingAddress(String keyword, Integer page);
     ApiResponse<List<Room>> getByBuildingId(Long buildingId);
     ApiResponse<Room> getById(Long id);
+    ApiResponse<List<Room>> getAvailableRooms();
     ApiResponse<Room> create(CreateRoomRequest roomRequest);
     ApiResponse<Room> update(Long id, Room room);
     ApiResponse<Void> delete(Long id);
