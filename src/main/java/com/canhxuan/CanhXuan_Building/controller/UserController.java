@@ -95,7 +95,6 @@ public class UserController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        userService.delete(id);
         return ResponseEntity.ok(userService.delete(id));
     }
 }

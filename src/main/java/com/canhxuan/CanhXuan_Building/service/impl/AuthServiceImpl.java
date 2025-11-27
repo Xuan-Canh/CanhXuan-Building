@@ -63,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setCity(request.getCity());
-//        user.setRole("ADMIN");
+//        user.setRole(Role.ADMIN);
         userRepository.save(user);
         response.setSuccess(true);
         response.setMessage("Register successfully");
