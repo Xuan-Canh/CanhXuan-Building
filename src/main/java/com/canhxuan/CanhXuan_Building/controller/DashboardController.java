@@ -2,6 +2,7 @@ package com.canhxuan.CanhXuan_Building.controller;
 
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.DashboardDto;
+import com.canhxuan.CanhXuan_Building.dto.response.DashboardResponse;
 import com.canhxuan.CanhXuan_Building.service.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,8 +22,8 @@ public class DashboardController {
 
     @GetMapping("/summary")
     @PreAuthorize("hasAuthority('DASHBOARD_VIEW')")
-    public ResponseEntity<ApiResponse<DashboardDto>> getDashboardSummary() {
-        ApiResponse<DashboardDto> response = dashboardService.getDashboard();
+    public ResponseEntity<ApiResponse<DashboardResponse>> getDashboardSummary() {
+        ApiResponse<DashboardResponse> response = dashboardService.getDashboard();
         return ResponseEntity.ok(response);
     }
 }

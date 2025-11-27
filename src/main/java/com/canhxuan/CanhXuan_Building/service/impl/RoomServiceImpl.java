@@ -2,10 +2,13 @@ package com.canhxuan.CanhXuan_Building.service.impl;
 
 import com.canhxuan.CanhXuan_Building.dto.request.CreateRoomRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.ImageDto;
+import com.canhxuan.CanhXuan_Building.dto.response.RoomDTO;
 import com.canhxuan.CanhXuan_Building.entity.Building;
 import com.canhxuan.CanhXuan_Building.entity.Room;
 import com.canhxuan.CanhXuan_Building.entity.RoomImage;
 import com.canhxuan.CanhXuan_Building.entity.RoomStatus;
+import com.canhxuan.CanhXuan_Building.mapper.ResponseMapper;
 import com.canhxuan.CanhXuan_Building.repository.BuildingRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomImageRepository;
 import com.canhxuan.CanhXuan_Building.repository.RoomRepository;
@@ -30,11 +33,13 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final RoomImageRepository roomImageRepository;
     private final BuildingRepository buildingRepository;
+    private final ResponseMapper responseMapper;
 
-    public RoomServiceImpl(RoomRepository roomRepository, RoomImageRepository roomImageRepository, BuildingRepository buildingRepository) {
+    public RoomServiceImpl(RoomRepository roomRepository, RoomImageRepository roomImageRepository, BuildingRepository buildingRepository, ResponseMapper responseMapper) {
         this.roomRepository = roomRepository;
         this.roomImageRepository = roomImageRepository;
         this.buildingRepository = buildingRepository;
+        this.responseMapper = responseMapper;
     }
 
     @Override
@@ -111,7 +116,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ApiResponse<Room> update(Long id, Room room) {
+    public ApiResponse<RoomDTO> update(Long id, Room room) {
         Room existingRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
         Building building = buildingRepository.findById(existingRoom.getBuilding().getId()).get();
@@ -128,10 +133,10 @@ public class RoomServiceImpl implements RoomService {
         existingRoom.setStatus(room.getStatus());
         existingRoom.setDescription(room.getDescription());
 
-        ApiResponse<Room> response = new ApiResponse<>();
+        ApiResponse<RoomDTO> response = new ApiResponse<>();
         response.setMessage("Update room successfully");
         response.setSuccess(true);
-        response.setData(roomRepository.save(existingRoom));
+        response.setData(responseMapper.toRoomDTO(roomRepository.save(existingRoom)));
         return response;
     }
 
@@ -176,11 +181,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ApiResponse<List<RoomImage>> findImagesByRoomId(Long roomId) {
-        ApiResponse<List<RoomImage>> response = new ApiResponse<>();
+    public ApiResponse<List<ImageDto>> findImagesByRoomId(Long roomId) {
+        ApiResponse<List<ImageDto>> response = new ApiResponse<>();
         response.setMessage("Get room images successfully");
         response.setSuccess(true);
-        response.setData(roomImageRepository.findByRoomId(roomId));
+        response.setData(roomImageRepository.findByRoomId(roomId).stream().map(
+                roomImage -> responseMapper.toImageDto(roomImage)
+        ).toList(
+        ));
         return response;
     }
 

@@ -5,7 +5,9 @@ import com.canhxuan.CanhXuan_Building.dto.request.MailDto;
 import com.canhxuan.CanhXuan_Building.dto.request.ServiceUsageDetail;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.InvoiceResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.InvoiceServiceDetailResponse;
 import com.canhxuan.CanhXuan_Building.entity.*;
+import com.canhxuan.CanhXuan_Building.mapper.ResponseMapper;
 import com.canhxuan.CanhXuan_Building.repository.*;
 import com.canhxuan.CanhXuan_Building.service.InvoiceService;
 import com.canhxuan.CanhXuan_Building.utils.AuthHelper;
@@ -13,16 +15,15 @@ import com.canhxuan.CanhXuan_Building.utils.kafka.Producer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
@@ -33,8 +34,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final Producer producer;
     private final UserRepository userRepository;
     private final AuthHelper authHelper;
+    private final ResponseMapper responseMapper;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository, InvoiceServiceDetailRepository invoiceServiceDetailRepository, ServiceRepository serviceRepository, Producer producer, UserRepository userRepository, AuthHelper authHelper) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, ContractRepository contractRepository, InvoiceServiceDetailRepository invoiceServiceDetailRepository, ServiceRepository serviceRepository, Producer producer, UserRepository userRepository, AuthHelper authHelper, ResponseMapper responseMapper) {
         this.invoiceRepository = invoiceRepository;
         this.contractRepository = contractRepository;
         this.invoiceServiceDetailRepository = invoiceServiceDetailRepository;
@@ -42,41 +44,27 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.producer = producer;
         this.userRepository = userRepository;
         this.authHelper = authHelper;
+        this.responseMapper = responseMapper;
     }
 
     @Override
     public ApiResponse<Page<InvoiceResponse>> getAll(Integer page) {
-        authHelper.requirePermission(Permission.INVOICE_MANAGE, Permission.INVOICE_READ_OWN);
-        User user = authHelper.getCurrentUser();
 
         Pageable pageable = PageRequest.of(Math.max(0, page), 10);
         ApiResponse<Page<InvoiceResponse>> apiResponse = new ApiResponse<>();
 
-        Page<Invoice> invoices;
+        Page<Long> pageIds;
+        List<Invoice> invoices;
+        pageIds = invoiceRepository.findPageIds(pageable);
 
-        if (user.getRole().hasPermission(Permission.INVOICE_MANAGE)) {
-             invoices = invoiceRepository.findAll(pageable);
-        } else {
-            invoices = invoiceRepository.findByCreatedBy(user, pageable);
-        }
+        invoices = invoiceRepository.findByIdsWithDetails(pageIds.getContent());
 
-        Page<InvoiceResponse> responsePage = invoices.map(invoice -> {
-            InvoiceResponse response = new InvoiceResponse();
-            response.setId(invoice.getId());
-            response.setContract(invoice.getContract());
-            response.setInvoiceDate(invoice.getInvoiceDate());
-            response.setDueDate(invoice.getDueDate());
-            response.setRoomRent(invoice.getRoomRent());
-            response.setTotalServiceFee(invoice.getTotalServiceFee());
-            response.setTotalAmount(invoice.getTotalAmount());
-            response.setStatus(invoice.getStatus());
-            response.setNote(invoice.getNote());
-            response.setPaidAt(invoice.getPaidAt());
-            response.setServiceDetail(invoice.getServiceDetails());
+        List<InvoiceResponse> responsePage = invoices.stream().map(invoice -> {
+            InvoiceResponse response = responseMapper.toInvoiceResponse(invoice);
             return response;
-        });
+        }).toList();
 
-        apiResponse.setData(responsePage);
+        apiResponse.setData(new PageImpl<>(responsePage, pageable, pageIds.getTotalElements()));
         apiResponse.setMessage("Get all invoices successfully");
         apiResponse.setSuccess(true);
         return apiResponse;
@@ -89,7 +77,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (invoice != null) {
             InvoiceResponse response = new InvoiceResponse();
             response.setId(invoice.getId());
-            response.setContract(invoice.getContract());
+            response.setContract(responseMapper.toContractResponse(invoice.getContract()));
             response.setInvoiceDate(invoice.getInvoiceDate());
             response.setDueDate(invoice.getDueDate());
             response.setRoomRent(invoice.getRoomRent());
@@ -98,7 +86,13 @@ public class InvoiceServiceImpl implements InvoiceService {
             response.setStatus(invoice.getStatus());
             response.setNote(invoice.getNote());
             response.setPaidAt(invoice.getPaidAt());
-            response.setServiceDetail(invoice.getServiceDetails());
+            response.setServiceDetail(invoice.getServiceDetails().stream().map(
+                    detail -> {
+                        InvoiceServiceDetailResponse serviceDetailResponse = responseMapper.toInvoiceServiceDetailResponse(detail);
+                        return serviceDetailResponse;
+                    }
+            ).toList(
+            ));
             apiResponse.setData(response);
             apiResponse.setMessage("Get invoice by id successfully");
             apiResponse.setSuccess(true);
@@ -119,7 +113,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         List<InvoiceServiceDetail> details = new ArrayList<>();
 
-        for (ServiceUsageDetail usage : createInvoiceRequest.getServiceUsageDetails()){
+        for (ServiceUsageDetail usage : createInvoiceRequest.getServiceUsageDetails()) {
             InvoiceServiceDetail serviceDetail = new InvoiceServiceDetail();
             com.canhxuan.CanhXuan_Building.entity.Service service = serviceRepository.findById(usage.getServiceId())
                     .orElseThrow(() -> new RuntimeException("Service not found"));
@@ -150,7 +144,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setStatus(InvoiceStatus.UNPAID);
         invoice.setNote(createInvoiceRequest.getNote());
         User createdBy = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         invoice.setCreatedBy(createdBy);
         Invoice saved = invoiceRepository.save(invoice);
         String to = saved.getContract().getCustomer().getEmail();
@@ -169,7 +163,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         producer.send("invoice-topic", message);
         InvoiceResponse response = new InvoiceResponse();
         response.setId(saved.getId());
-        response.setContract(saved.getContract());
+        response.setContract(responseMapper.toContractResponse(saved.getContract()));
         response.setInvoiceDate(saved.getInvoiceDate());
         response.setDueDate(saved.getDueDate());
         response.setRoomRent(saved.getRoomRent());
@@ -178,7 +172,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         response.setStatus(saved.getStatus());
         response.setNote(saved.getNote());
         response.setPaidAt(saved.getPaidAt());
-        response.setServiceDetail(saved.getServiceDetails());
+        response.setServiceDetail(saved.getServiceDetails().stream().map(
+                detail -> {
+                    InvoiceServiceDetailResponse serviceDetailResponse = responseMapper.toInvoiceServiceDetailResponse(detail);
+                    return serviceDetailResponse;
+                }
+        ).toList());
         ApiResponse<InvoiceResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Create invoice successfully");
@@ -199,7 +198,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice = invoiceRepository.save(invoice);
         InvoiceResponse response = new InvoiceResponse();
         response.setId(invoice.getId());
-        response.setContract(invoice.getContract());
+        response.setContract(responseMapper.toContractResponse(invoice.getContract()));
         response.setInvoiceDate(invoice.getInvoiceDate());
         response.setDueDate(invoice.getDueDate());
         response.setRoomRent(invoice.getRoomRent());
@@ -208,7 +207,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         response.setStatus(invoice.getStatus());
         response.setNote(invoice.getNote());
         response.setPaidAt(invoice.getPaidAt());
-        response.setServiceDetail(invoice.getServiceDetails());
+        response.setServiceDetail(invoice.getServiceDetails().stream().map(
+                detail -> {
+                    InvoiceServiceDetailResponse serviceDetailResponse = responseMapper.toInvoiceServiceDetailResponse(detail);
+                    return serviceDetailResponse;
+                }
+        ).toList(
+        ));
         ApiResponse<InvoiceResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Mark invoice as paid successfully");

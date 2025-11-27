@@ -14,6 +14,4 @@ public class DashboardDto {
     Long rentedRooms;
     Long totalCustomers;
     Long activeContracts;
-    Double monthlyRevenue;
-    Long unpaidInvoices;
 }

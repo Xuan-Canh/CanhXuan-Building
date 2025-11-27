@@ -19,7 +19,7 @@ import java.util.List;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class InvoiceResponse {
     Long id;
-    Contract contract;
+    ContractResponse contract;
     LocalDate invoiceDate;
     LocalDate dueDate;
     Double roomRent;
@@ -28,6 +28,5 @@ public class InvoiceResponse {
     InvoiceStatus status;
     String note;
     LocalDateTime paidAt;
-    User createdBy;
-    List<InvoiceServiceDetail> serviceDetail;
+    List<InvoiceServiceDetailResponse> serviceDetail;
 }

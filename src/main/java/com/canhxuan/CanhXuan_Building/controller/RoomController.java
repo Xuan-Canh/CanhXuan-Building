@@ -2,6 +2,8 @@ package com.canhxuan.CanhXuan_Building.controller;
 
 import com.canhxuan.CanhXuan_Building.dto.request.CreateRoomRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.ImageDto;
+import com.canhxuan.CanhXuan_Building.dto.response.RoomDTO;
 import com.canhxuan.CanhXuan_Building.entity.Room;
 import com.canhxuan.CanhXuan_Building.entity.RoomImage;
 import com.canhxuan.CanhXuan_Building.service.RoomService;
@@ -65,7 +67,7 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}/images")
-    public ResponseEntity<ApiResponse<List<RoomImage>>> findImagesByRoomId(@PathVariable Long roomId) {
+    public ResponseEntity<ApiResponse<List<ImageDto>>> findImagesByRoomId(@PathVariable Long roomId) {
         return ResponseEntity.ok(roomService.findImagesByRoomId(roomId));
     }
 
@@ -105,7 +107,7 @@ public class RoomController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROOM_MANAGE')")
-    public ResponseEntity<ApiResponse<Room>> update(@PathVariable Long id, @RequestBody Room room) {
+    public ResponseEntity<ApiResponse<RoomDTO>> update(@PathVariable Long id, @RequestBody Room room) {
         return ResponseEntity.ok(roomService.update(id, room));
     }
 

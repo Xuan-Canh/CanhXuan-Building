@@ -1,6 +1,7 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
 import com.canhxuan.CanhXuan_Building.dto.response.DashboardDto;
+import com.canhxuan.CanhXuan_Building.dto.response.InvoiceDashboardDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +28,11 @@ import java.util.List;
                         @ColumnResult(name = "emptyRooms", type = Long.class),
                         @ColumnResult(name = "rentedRooms", type = Long.class),
                         @ColumnResult(name = "totalCustomers", type = Long.class),
-                        @ColumnResult(name = "activeContracts", type = Long.class),
-                        @ColumnResult(name = "monthlyRevenue", type = Double.class),
-                        @ColumnResult(name = "unpaidInvoices", type = Long.class)
+                        @ColumnResult(name = "activeContracts", type = Long.class)
                 }
         )
 )
+
 @NamedEntityGraph(
         name = "Building.images",
         attributeNodes = @NamedAttributeNode("images")
@@ -63,6 +64,7 @@ public class Building {
     Integer rooms;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 25)
     List<BuildingImage> images = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -4,7 +4,6 @@ import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.BuildingResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.ImageDto;
 import com.canhxuan.CanhXuan_Building.entity.Building;
-import com.canhxuan.CanhXuan_Building.entity.BuildingImage;
 import com.canhxuan.CanhXuan_Building.service.BuildingService;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.core.io.Resource;
@@ -44,7 +43,7 @@ public class BuildingController {
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('BUILDING_MANAGE') or hasAuthority('BUILDING_READ')")
     public ResponseEntity<ApiResponse<Page<BuildingResponse>>> getByName(@RequestParam(defaultValue = "") String keyword,
-                                                                 @RequestParam(defaultValue = "0") Integer page) {
+                                                                         @RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(buildingService.searchByNameOrAddress(keyword, page));
     }
 
@@ -85,7 +84,7 @@ public class BuildingController {
     @PostMapping("/{buildingId}/images")
     @PreAuthorize("hasAuthority('BUILDING_MANAGE')")
     public ResponseEntity<ApiResponse<ImageDto>> addImageToBuilding(@PathVariable Long buildingId,
-                                                                         @RequestParam("file") MultipartFile image) throws IOException {
+                                                                    @RequestParam("file") MultipartFile image) throws IOException {
         try {
             return ResponseEntity.ok(buildingService.saveImage(buildingId, image));
         } catch (IOException e) {

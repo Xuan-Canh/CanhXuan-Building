@@ -30,7 +30,7 @@ public class InvoiceController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('INVOICE_MANAGE') or hasAuthority('INVOICE_READ_OWN')")
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE')")
     public ResponseEntity<ApiResponse<Page<InvoiceResponse>>> getAll(@RequestParam(defaultValue = "0") Integer page) {
         return ResponseEntity.ok(invoiceService.getAll(page));
     }
@@ -49,7 +49,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('INVOICE_MANAGE') or (hasAuthority('INVOICE_READ_OWN') and @authHelper.isInvoiceOwner(#id))")
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE')")
     public ResponseEntity<ApiResponse<InvoiceResponse>> getById(@PathVariable String id) {
         return ResponseEntity.ok(invoiceService.getById(Long.parseLong(id)));
     }
@@ -61,7 +61,7 @@ public class InvoiceController {
     }
 
     @PatchMapping("/{id}/pay")
-    @PreAuthorize("hasAuthority('INVOICE_MANAGE') or (hasAuthority('INVOICE_READ_OWN') and @authHelper.isInvoiceOwner(#id))")
+    @PreAuthorize("hasAuthority('INVOICE_MANAGE')")
     public ResponseEntity<ApiResponse<InvoiceResponse>> markAsPaid(@PathVariable Long id) {
         return ResponseEntity.ok(invoiceService.markAsPaid(id));
     }

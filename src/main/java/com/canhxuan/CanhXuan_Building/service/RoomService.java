@@ -2,6 +2,8 @@ package com.canhxuan.CanhXuan_Building.service;
 
 import com.canhxuan.CanhXuan_Building.dto.request.CreateRoomRequest;
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
+import com.canhxuan.CanhXuan_Building.dto.response.ImageDto;
+import com.canhxuan.CanhXuan_Building.dto.response.RoomDTO;
 import com.canhxuan.CanhXuan_Building.entity.Room;
 import com.canhxuan.CanhXuan_Building.entity.RoomImage;
 import org.springframework.data.domain.Page;
@@ -17,9 +19,9 @@ public interface RoomService {
     ApiResponse<Room> getById(Long id);
     ApiResponse<List<Room>> getAvailableRooms();
     ApiResponse<Room> create(CreateRoomRequest roomRequest);
-    ApiResponse<Room> update(Long id, Room room);
+    ApiResponse<RoomDTO> update(Long id, Room room);
     ApiResponse<Void> delete(Long id);
     ApiResponse<RoomImage> saveImage(Long roomId, MultipartFile file) throws IOException;
-    ApiResponse<List<RoomImage>> findImagesByRoomId(Long roomId);
+    ApiResponse<List<ImageDto>> findImagesByRoomId(Long roomId);
     ApiResponse<Void> deleteImage(Long imageId);
 }

@@ -1,6 +1,7 @@
 package com.canhxuan.CanhXuan_Building.entity;
 
 
+import com.canhxuan.CanhXuan_Building.dto.response.InvoiceDashboardDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,17 +18,27 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SqlResultSetMapping(
+        name = "InvoiceDashboardMapping",
+        classes = @ConstructorResult(
+                targetClass = InvoiceDashboardDto.class,
+                columns = {
+                        @ColumnResult(name = "monthlyRevenue", type = Double.class),
+                        @ColumnResult(name = "unpaidInvoices", type = Long.class)
+                }
+        )
+)
 public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_id", nullable = false)
     Contract contract;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     java.util.List<InvoiceServiceDetail> serviceDetails;
 
     @Column(nullable = false)

@@ -35,7 +35,6 @@ public class Customer {
     @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone number must be between 10 and 11 digits")
     String phone;
 
-    @NotBlank(message = "Email is required")
     @Email
     String email;
 

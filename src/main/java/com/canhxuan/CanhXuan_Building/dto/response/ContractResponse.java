@@ -26,5 +26,5 @@ public class ContractResponse {
     String note;
     CustomerDTO customer;
     RoomDTO room;
-    List<ServiceDTO> service;
+    List<ServiceDTO> services;
 }

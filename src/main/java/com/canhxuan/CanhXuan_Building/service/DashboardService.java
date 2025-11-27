@@ -2,8 +2,9 @@ package com.canhxuan.CanhXuan_Building.service;
 
 import com.canhxuan.CanhXuan_Building.dto.response.ApiResponse;
 import com.canhxuan.CanhXuan_Building.dto.response.DashboardDto;
+import com.canhxuan.CanhXuan_Building.dto.response.DashboardResponse;
 
 public interface DashboardService {
 
-    public ApiResponse<DashboardDto> getDashboard();
+    public ApiResponse<DashboardResponse> getDashboard();
 }

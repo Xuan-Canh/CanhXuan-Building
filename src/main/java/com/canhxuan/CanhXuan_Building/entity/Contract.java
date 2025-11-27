@@ -21,11 +21,19 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NamedEntityGraph(name = "Contract.detail", attributeNodes = {
+@NamedEntityGraph(name = "Contract.withBuildingImages", attributeNodes = {
         @NamedAttributeNode(value = "customer"),
-        @NamedAttributeNode(value = "room"),
+        @NamedAttributeNode(value = "room", subgraph = "room-subgraph"),
         @NamedAttributeNode(value = "services")
+}, subgraphs = {
+        @NamedSubgraph(name = "room-subgraph", attributeNodes = {
+                @NamedAttributeNode(value = "building", subgraph = "building-subgraph")
+        }),
+        @NamedSubgraph(name = "building-subgraph", attributeNodes = {
+                @NamedAttributeNode("images")
+        })
 })
+
 public class Contract implements Serializable {
 
     @Id
