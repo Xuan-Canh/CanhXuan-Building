@@ -108,14 +108,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
         String message = "Data integrity violation";
 
-        if (e.getCause() instanceof ConstraintViolationException) {
+        if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
+
             Throwable cause = e.getCause();
             String causeMessage = cause.getMessage().toLowerCase();
 
             if (causeMessage.contains("duplicate") || causeMessage.contains("unique")) {
-                message = "This value already exists";
+                message = "Đã tồn tại dữ liệu trùng lặp";
             } else if (causeMessage.contains("foreign key")) {
-                message = "Cannot perform this action due to related data";
+                message = "Không thể xóa do bản ghi này có dữ liệu liên quan";
             }
         }
 

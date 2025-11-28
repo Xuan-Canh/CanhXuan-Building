@@ -49,7 +49,7 @@ public class Customer {
 
     String gender;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", orphanRemoval = true)
     @JsonIgnore
     java.util.List<Contract> contracts;
 }

@@ -67,7 +67,7 @@ public class Building {
     @BatchSize(size = 25)
     List<BuildingImage> images = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "building", orphanRemoval = true)
     @JsonIgnoreProperties("building")
     List<Room> roomList = new ArrayList<>();
 

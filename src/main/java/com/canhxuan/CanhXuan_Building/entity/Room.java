@@ -61,7 +61,7 @@ public class Room {
     @JsonIgnoreProperties("roomList")
     Building building;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", orphanRemoval = true)
     @JsonIgnore
     List<Contract> contracts = new ArrayList<>();
 }
